@@ -13,7 +13,13 @@ services:
     environment:
       - FRANKENPHP_CONFIG=worker ./public/index.php
     restart: unless-stopped
-
+    deploy: 
+      resources:
+        limits:
+          memory: 2GB
+        reservations:
+          memory: 2GB
+          
   browser-sync:
     image: node:18-alpine
     working_dir: /app
