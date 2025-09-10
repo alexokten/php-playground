@@ -1,0 +1,20 @@
+{
+    # Enable FrankenPHP
+    frankenphp
+    # Enable debug mode for development
+    debug
+}
+
+:80 {
+    # Set document root to public directory
+    root * /app/public
+    
+    # Enable PHP processing
+    php_fastcgi unix//var/run/php/php-fpm.sock
+    
+    # Try to serve files, fallback to index.php
+    try_files {path} /index.php?{query}
+    
+    # Enable file server for static assets
+    file_server
+}
