@@ -2,30 +2,128 @@
 
 declare(strict_types=1);
 
-// TODO(human): Implement your application logic here
-// Consider: What kind of PHP application do you want to build?
-// Consider: Do you need routing, templating, or database connectivity?
-// Consider: Should this be a simple script or a more structured application?
 
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PHP Playground with FrankenPHP</title>
-</head>
-<body>
-    <h1>Welcomes to your PHP Playground!</h1>
-    <p>FrankenPHP is running successfully.</p>
-    <p>PHP Version: <?= PHP_VERSION ?></p>
-    <p>Server: <?= $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown' ?></p>
-    
-    <h2>Quick Start Commands:</h2>
-    <ul>
-        <li><code>docker-compose up --build</code> - Start the development server</li>
-        <li><code>docker-compose down</code> - Stop the server</li>
-        <li>Visit <a href="http://localhost:8080">http://localhost:8080</a> to see your app</li>
-    </ul>
-</body>
-</html>
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use Spatie\Regex\Regex;
+
+ray()->clearAll();
+
+class Router
+{
+    private $routesList = [];
+
+    public function dispatch(): void
+    {
+        $requestURL = $_SERVER['REQUEST_URI'];
+
+        $req = ['params' => []];
+        $res = [];
+        $req['params'] = '123';
+
+        $route = $this->matchRoute($requestURL);
+        $this->verifyMethod($route['method']);
+        // $req['params'] = $this->extractParams($requestURL);
+        //
+        $this->extractParams($route['slug']);
+        $route['controller']($req, $res);
+    }
+
+    public function get(string $slug, callable $controller): void
+    {
+        $routeArray = [
+            'slug' => $slug,
+            'controller' => $controller,
+            'method' => 'GET'
+        ];
+
+        $this->addRoute($routeArray);
+    }
+
+    public function post(string $slug, callable $controller): void
+    {
+        $routeArray = [
+            'slug' => $slug,
+            'controller' => $controller,
+            'method' => 'POST'
+        ];
+
+        $this->addRoute($routeArray);
+    }
+
+    public function put(string $slug, callable $controller): void
+    {
+        $routeArray = [
+            'slug' => $slug,
+            'controller' => $controller,
+            'method' => 'PUT'
+        ];
+
+        $this->addRoute($routeArray);
+    }
+
+    public function delete(string $slug, callable $controller): void
+    {
+        $routeArray = [
+            'slug' => $slug,
+            'controller' => $controller,
+            'method' => 'DELETE'
+        ];
+
+        $this->addRoute($routeArray);
+    }
+
+    private function addRoute(array $route): void
+    {
+        array_push($this->routesList, $route);
+        ray($this->routesList, 'Added');
+    }
+
+    private function matchRoute(string $requestSlug): array
+    {
+        foreach ($this->routesList as $route) {
+            if ($route['slug'] === $requestSlug) {
+                return $route;
+            }
+        }
+        throw new Exception('Route not matched');
+    }
+
+    private function verifyMethod(string $requestMethod): bool
+    {
+        $requestMethod = $_SERVER['REQUEST_METHOD'];
+        if ($requestMethod !== $requestMethod) {
+            throw new Exception('Request method does not match');
+        }
+        return true;
+    }
+
+    private function extractParams(string $routeSlug): string
+    {
+        if (Regex::match('/\{\w+\}|:\w+/', $routeSlug)->hasMatch()) {
+            $params = [];
+            $matches = Regex::matchAll('/\{\w+\}|:\w+/', $routeSlug);
+
+            ray($matches);
+            foreach ($matches->results() as $match) {
+                ray($match);
+            }
+
+
+            return Regex::match('/\{\w+\}|:\w+/', $routeSlug)->result();
+        }
+        return '';
+    }
+}
+
+
+
+$router = new Router();
+
+$router->get('/api/user/:id/:test', function ($req, $res) {
+    ray($req['params'], ': PARAMS');
+});
+
+$router->dispatch();
+
+require __DIR__ . '/../controllers/home.php';

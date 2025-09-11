@@ -9,12 +9,15 @@ services:
     ports:
       - "8080:80"
       - "8443:443"
+      - "23517:23517"  # Ray debugging port
     volumes:
       - .:/app:cached
       - caddy_data:/data
       - caddy_config:/config
     environment:
       - FRANKENPHP_CONFIG=worker ./public/index.php
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # Required for Ray to connect to host
     restart: unless-stopped
     deploy: 
       resources:

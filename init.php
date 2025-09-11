@@ -35,4 +35,4 @@ $capsule->setAsGlobal();
 // Setup the Eloquent ORM
 $capsule->bootEloquent();
 
-return $capsule;
+die('terminated script');
