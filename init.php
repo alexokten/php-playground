@@ -7,11 +7,12 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
 use Dotenv\Dotenv;
 
-// Load environment variables
+putenv('RAY_HOST=host.docker.internal');
+putenv('RAY_PORT=23517');
+
 $dotenv = Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
-// Create database connection
 $capsule = new Capsule;
 
 $capsule->addConnection([
