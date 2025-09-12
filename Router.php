@@ -4,6 +4,16 @@ declare(strict_types=1);
 
 use Spatie\Regex\Regex;
 
+class RouterUtils
+{
+    public const PARAMETER_MATCH_PATTERN = '/\:\w+/';
+
+    public static function matchParamPattern(string $routeSegment)
+    {
+        return Regex::match(self::PARAMETER_MATCH_PATTERN, $routeSegment)->hasMatch();
+    }
+}
+
 class RouteItem
 {
     public string $method;
@@ -41,136 +51,139 @@ class ResponseItem
 
 class Router
 {
-    private $routesList = [];
-    private $matchBracesAndSemiColonsRegex = '/\:\w+/';
+    private $registeredRoutes = [];
 
     public function dispatch(): void
     {
-        $requestURL = $_SERVER['REQUEST_URI'];
+        $incomingUrl = $_SERVER['REQUEST_URI'];
 
-        $route = $this->matchRoute($requestURL);
+        $matchedRoute = $this->findMatchingRoute($incomingUrl);
 
-        $this->verifyMethod($route->method);
+        $this->verifyHttpMethod($matchedRoute->method);
 
-        $extractedParams = $this->extractParams($route->slug, $requestURL);
+        $urlParameters = $this->extractUrlParameters($matchedRoute->slug, $incomingUrl);
 
-        $req = new RequestItem($extractedParams);
-        $res = new ResponseItem();
+        $request = new RequestItem($urlParameters);
+        $response = new ResponseItem();
 
-        $callback = $route->callback;
-        $callback($req, $res);
+        $routeHandler = $matchedRoute->callback;
+        $routeHandler($request, $response);
     }
 
-    public function get(string $slug, callable $callback): void
+    public function get(string $urlPattern, callable $routeHandler): void
     {
         $routeItem = new RouteItem(
             method: 'GET',
-            slug: $slug,
-            callback: $callback
+            slug: $urlPattern,
+            callback: $routeHandler
         );
-        $this->addRoute($routeItem);
+        $this->registerRoute($routeItem);
     }
 
-    public function post(string $slug, callable $callback): void
+    public function post(string $urlPattern, callable $routeHandler): void
     {
         $routeItem = new RouteItem(
             method: 'POST',
-            slug: $slug,
-            callback: $callback
+            slug: $urlPattern,
+            callback: $routeHandler
         );
-        $this->addRoute($routeItem);
+        $this->registerRoute($routeItem);
     }
 
-    public function put(string $slug, callable $callback): void
+    public function put(string $urlPattern, callable $routeHandler): void
     {
         $routeItem = new RouteItem(
             method: 'PUT',
-            slug: $slug,
-            callback: $callback
+            slug: $urlPattern,
+            callback: $routeHandler
         );
-        $this->addRoute($routeItem);
+        $this->registerRoute($routeItem);
     }
 
-    public function delete(string $slug, callable $callback): void
+    public function delete(string $urlPattern, callable $routeHandler): void
     {
         $routeItem = new RouteItem(
             method: 'DELETE',
-            slug: $slug,
-            callback: $callback
+            slug: $urlPattern,
+            callback: $routeHandler
         );
-        $this->addRoute($routeItem);
+        $this->registerRoute($routeItem);
     }
 
-    private function addRoute(RouteItem $routeItem): void
+    private function registerRoute(RouteItem $routeDefinition): void
     {
-        array_push($this->routesList, $routeItem);
+        array_push($this->registeredRoutes, $routeDefinition);
     }
 
-    private function matchRoute(string $requestSlug): RouteItem
+    private function findMatchingRoute(string $incomingUrlPath): RouteItem
     {
-        foreach ($this->routesList as $route) {
-            if ($route->slug === $requestSlug) {
-                return $route;
+        $utils = new RouterUtils();
+
+        foreach ($this->registeredRoutes as $candidateRoute) {
+            if ($candidateRoute->slug === $incomingUrlPath) {
+                return $candidateRoute;
             }
 
-            $splitRouteSlug = explode('/', $route->slug);
-            $splitRequestSlug = explode('/', $requestSlug);
+            $routeSegments = explode('/', $candidateRoute->slug);
+            $urlSegments = explode('/', $incomingUrlPath);
 
-            if (count($splitRouteSlug) !== count($splitRequestSlug)) {
+            if (count($routeSegments) !== count($urlSegments)) {
                 continue;
             }
 
             $isMatch = true;
 
-            for ($i = 0; $i < count($splitRouteSlug); $i++) {
+            for ($segmentIndex = 0; $segmentIndex < count($routeSegments); $segmentIndex++) {
 
-                $routeSegment = $splitRouteSlug[$i];
-                $requestSegment = $splitRequestSlug[$i];
+                $routeSegment = $routeSegments[$segmentIndex];
+                $urlSegment = $urlSegments[$segmentIndex];
 
-                if (Regex::match($this->matchBracesAndSemiColonsRegex,  $routeSegment)->hasMatch()) {
+                if ($utils->matchParamPattern($routeSegment)) {
                     continue;
                 }
 
-                if ($routeSegment !== $requestSegment) {
+                if ($routeSegment !== $urlSegment) {
                     $isMatch = false;
                     break;
                 }
             }
             if ($isMatch) {
-                return $route;
+                return $candidateRoute;
             }
         }
         throw new Exception('Route not matched');
     }
 
-    private function verifyMethod(string $routeRequestMethod): bool
+    private function verifyHttpMethod(string $expectedHttpMethod): bool
     {
-        $requestMethod = $_SERVER['REQUEST_METHOD'];
-        if ($routeRequestMethod !== $requestMethod) {
+        $actualHttpMethod = $_SERVER['REQUEST_METHOD'];
+        if ($expectedHttpMethod !== $actualHttpMethod) {
             throw new Exception('Request method does not match');
         }
         return true;
     }
 
-    private function extractParams(string $routeSlugToMatch, string $requestSlugToMatch): array
+    private function extractUrlParameters(string $routePattern, string $actualUrl): array
     {
-        $extractedParams = [];
+        $utils = new RouterUtils();
 
-        $splitRouteSlug = explode('/', $routeSlugToMatch);
-        $splitRequestSlug = explode('/', $requestSlugToMatch);
+        $extractedParameters = [];
 
-        for ($i = 0; $i < count($splitRouteSlug); $i++) {
-            $routeSegment = $splitRouteSlug[$i];
-            $requestSegment = $splitRequestSlug[$i];
-            $matchResult =  Regex::match($this->matchBracesAndSemiColonsRegex,  $routeSegment);
-            if (Regex::match($this->matchBracesAndSemiColonsRegex,  $routeSegment)->hasMatch()) {
-                $extractedParams += [$routeSegment => $requestSegment];
+        $routeSegments = explode('/', $routePattern);
+        $urlSegments = explode('/', $actualUrl);
+
+        for ($segmentIndex = 0; $segmentIndex < count($routeSegments); $segmentIndex++) {
+            $routeSegment = $routeSegments[$segmentIndex];
+            $urlSegment = $urlSegments[$segmentIndex];
+
+            if ($utils->matchParamPattern($routeSegment)) {
+                $extractedParameters += [$routeSegment => $urlSegment];
             }
 
-            if ($routeSegment !== $requestSegment) {
+            if ($routeSegment !== $urlSegment) {
                 continue;
             }
         }
-        return $extractedParams;
+        return $extractedParameters;
     }
 }
