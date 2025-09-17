@@ -43,7 +43,7 @@ INSERT INTO events (title, description, eventDate, location, maxTickets, isActiv
 ('Mobile API Development', 'Designing and building APIs specifically for mobile applications using PHP.', '2025-07-08 11:30:00', 'Charlotte', 65, TRUE);
 
 -- Create some event attendee relationships (users attending events)
-INSERT INTO event_attendees (user_id, event_id, registered_at) VALUES
+INSERT INTO event_attendees (userId, eventId, registeredAt) VALUES
 (1, 1, '2024-05-01 10:30:00'),  -- John attending PHP Conference
 (1, 3, '2024-07-01 14:20:00'),  -- John attending Database Seminar
 (2, 1, '2024-05-02 09:15:00'),  -- Sarah attending PHP Conference
