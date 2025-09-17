@@ -19,6 +19,10 @@ php -S localhost:8000
 
 # Check PHP version
 php --version
+
+# Run database migrations and setup (requires Docker)
+docker-compose up -d
+docker-compose exec server php database/setup.php
 ```
 
 ## Architecture
