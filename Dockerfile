@@ -19,6 +19,9 @@ COPY composer.json ./
 COPY composer.loc[k] ./
 RUN composer install --no-dev --optimize-autoloader
 
+RUN pecl install xdebug \
+    && docker-php-ext-enable xdebug
+
 # Copy application files
 COPY . /app
 
