@@ -29,14 +29,4 @@ class Event extends Model
         'isActive' => true,
         'maxTickets' => 50
     ];
-
-    public function isFutureEvent(): bool
-    {
-        return $this->eventDate && $this->eventDate->isFuture();
-    }
-
-    public function isPastEvent(): bool
-    {
-        return $this->eventDate && $this->eventDate->isPast();
-    }
 }

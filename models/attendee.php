@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 use Illuminate\Database\Eloquent\Model;
 
-class User extends Model
+class Attendee extends Model
 {
     protected $table = 'users';
+
+    const CREATED_AT = 'createdAt';
+    const UPDATED_AT = 'updatedAt';
 
     protected $fillable = [
         'firstName',
@@ -23,4 +26,14 @@ class User extends Model
         'city' => 'string',
         'isActive' => 'bool',
     ];
+
+    public function events()
+    {
+        return $this->belongsToMany(
+            Event::class,
+            'event_attendees',
+            'userId',
+            'eventId'
+        );
+    }
 }

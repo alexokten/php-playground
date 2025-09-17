@@ -10,7 +10,7 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 echo "Running database setup...\n";
 
 // Run migrations
-$migrationSql = file_get_contents(__DIR__ . '/migrations.sql');
+$migrationSql = file_get_contents(__DIR__ . '/update_migrations.sql');
 
 // Remove comments and split properly
 $migrationSql = preg_replace('/^--.*$/m', '', $migrationSql);
