@@ -13,7 +13,7 @@ class User extends Model
         'lastName',
         'dateOfBirth',
         'city',
-        'isActive'
+        'isActive',
     ];
 
     protected $casts = [
@@ -23,14 +23,4 @@ class User extends Model
         'city' => 'string',
         'isActive' => 'bool',
     ];
-
-    public function getFullName(): string
-    {
-        return $this->firstName . ' ' . $this->lastName;
-    }
-
-    public function isUserActive(): string
-    {
-        return $this->isActive;
-    }
 }
