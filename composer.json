@@ -15,8 +15,7 @@
         }
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.87",
-        "symfony/var-dumper": "^7.0"
+        "friendsofphp/php-cs-fixer": "^3.87"
     },
     "config": {
         "optimize-autoloader": true,
