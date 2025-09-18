@@ -65,6 +65,12 @@ try {
         $res::sendResponse(responseJson: $response);
     });
 
+    $router->get('/api/events/unregister/:eventId/:attendeeId', function ($req, $res) {
+        [':eventId' => $eventId, ':attendeeId' => $attendeeId] = $req->params;
+        $response = new AttendeeController()->unregisterForEvent($attendeeId, $eventId);
+        $res::sendResponse(responseJson: $response);
+    });
+
     $router->dispatch();
 } catch (Exception $e) {
     if ($_ENV['APP_ENV'] === 'development') {

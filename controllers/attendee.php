@@ -90,12 +90,12 @@ class AttendeeController
                 return json_encode(['error', 'Event not found'], 500);
             }
 
-            $exists = $attendee->events()->where('eventId', $eventId)->exists();
+            $exists = $attendee->eventsExcludingUnregistered()->where('eventId', $eventId)->exists();
             if ($exists) {
                 return json_encode(['error', 'Attendee already registered for event'], 500);
             }
 
-            $attendee->events()->attach($eventId, [
+            $attendee->eventsExcludingUnregistered()->attach($eventId, [
                 'registeredAt' => Carbon::now(),
             ]);
 
@@ -110,7 +110,6 @@ class AttendeeController
     }
 
     public function unregisterForEvent(string | int $attendeeId, string | int $eventId): string
-
     {
         try {
             $attendee = Attendee::find($attendeeId);
@@ -123,17 +122,20 @@ class AttendeeController
                 return json_encode(['error', 'Event not found'], 500);
             }
 
-            $exists = $attendee->events()->where('eventId', $eventId)->exists();
+            ray($event);
+            $exists = $attendee->eventsExcludingUnregistered()->where('eventId', $eventId)->exists();
+
+            ray($exists);
             if (!$exists) {
                 return json_encode(['error', 'Attendee is not registered for event'], 500);
             }
 
-            $attendee->events()->updateExistingPivot($eventId, [
+            $attendee->eventsExcludingUnregistered()->updateExistingPivot($eventId, [
                 'unregisteredAt' => Carbon::now(),
             ]);
 
             return json_encode([
-                'message' => 'Successfully registered for event',
+                'message' => 'Successfully unregistered from event',
                 'attendee_id' => $attendeeId,
                 'event_id' => $eventId
             ]);
