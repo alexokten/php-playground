@@ -14,43 +14,43 @@ ray()->clearAll();
 $router = new Router();
 
 $router->get('/api/attendees/all', function ($req, $res) {
-    $AttendeeController = new AttendeeController();
-    $response = $AttendeeController->index();
+    $attendee = new AttendeeController();
+    $response = $attendee->index();
     ray()->toJson($response);
     $res::sendResponse();
 });
 
 $router->get('/api/attendee/id/:attendeeId', function ($req, $res) {
-    $AttendeeController = new AttendeeController();
-    $response = $AttendeeController->show($req->params[':attendeeId']);
+    $attendee = new AttendeeController();
+    $response = $attendee->show($req->params[':attendeeId']);
     ray()->toJson($response);
     $res::sendResponse();
 });
 
 $router->get('/api/attendee/create', function ($req, $res) {
-    $AttendeeController = new AttendeeController();
-    $response = $AttendeeController->store();
+    $attendee = new AttendeeController();
+    $response = $attendee->store();
     ray()->toJson($response);
     $res::sendResponse();
 });
 
 $router->get('/api/attendee/update/:attendeeId', function ($req, $res) {
-    $AttendeeController = new AttendeeController();
-    $response = $AttendeeController->update($req->params[':attendeeId']);
+    $attendee = new AttendeeController();
+    $response = $attendee->update($req->params[':attendeeId']);
     ray()->toJson($response);
     $res::sendResponse();
 });
 
 $router->get('/api/attendee/delete/:attendeeId', function ($req, $res) {
-    $AttendeeController = new AttendeeController();
-    $response = $AttendeeController->delete($req->params[':attendeeId']);
+    $attendee = new AttendeeController();
+    $response = $attendee->delete($req->params[':attendeeId']);
     ray()->toJson($response);
     $res::sendResponse();
 });
 
 $router->get('/api/events/:attendeeId', function ($req, $res) {
-    $AttendeeController = new AttendeeController();
-    $response = $AttendeeController->getsAttendeeEvents($req->params[':attendeeId']);
+    $attendee = new AttendeeController();
+    $response = $attendee->getsAttendeeEvents($req->params[':attendeeId']);
     ray()->toJson($response);
     $res::sendResponse();
 });
