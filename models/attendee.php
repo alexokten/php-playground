@@ -33,13 +33,23 @@ class Attendee extends Model
     }
 
 
-    public function events()
+    public function eventsExcludingUnregistered()
     {
         return $this->belongsToMany(
             Event::class,
             'events_attendees',
             'attendeeId',
             'eventId'
-        );
+        )->wherePivotNull('unregisteredAt');
+    }
+
+    public function allEventsRegistered()
+    {
+        return $this->belongsToMany(
+            Event::class,
+            'events_attendees',
+            'attendeeId',
+            'eventId'
+        )->withPivot(['registeredAt', 'unregisteredAt']);
     }
 }

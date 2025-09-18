@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Spatie\Regex\Regex;
+use Illuminate\Http\JsonResponse;
 
 class RouterUtils
 {
@@ -43,9 +44,11 @@ class RequestItem
 
 class ResponseItem
 {
-    public static function sendResponse(string $responseMessage = "Route found")
-    {
-        echo $responseMessage;
+    public static function sendResponse(
+        string $responseJson
+    ) {
+        ray($responseJson);
+        echo $responseJson;
     }
 }
 
