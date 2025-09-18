@@ -17,6 +17,7 @@ class Promoter extends Model
     protected $fillable = [
         'firstName',
         'lastName',
+        'email',
         'dateOfBirth',
         'city',
         'isActive',
@@ -27,6 +28,7 @@ class Promoter extends Model
         return [
             'firstName' => 'string',
             'lastName' => 'string',
+            'email' => 'string',
             'dateOfBirth' => 'datetime',
             'city' => 'string',
             'isActive' => 'bool',

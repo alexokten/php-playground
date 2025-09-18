@@ -13,8 +13,8 @@ class Venues extends Model
 
     protected $fillable = [
         'name',
-        'postCode',
-        'capacity',
+        'location',
+        'maxCapacity',
         'isActive',
     ];
 
@@ -22,8 +22,8 @@ class Venues extends Model
     {
         return [
             'name' => 'string',
-            'postCode' => 'string',
-            'capacity' => 'number',
+            'location' => 'string',
+            'maxCapacity' => 'number',
             'isActive' => 'bool',
         ];
     }

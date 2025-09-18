@@ -32,4 +32,14 @@ class Event extends Model
         'isActive' => true,
         'maxTickets' => 50
     ];
+
+    public function attendees()
+    {
+        return $this->belongsToMany(
+            Event::class,
+            'events_attendees',
+            'eventId',
+            'attendeeId'
+        );
+    }
 }

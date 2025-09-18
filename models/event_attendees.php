@@ -8,9 +8,13 @@ class EventAttendees extends Model
 {
     protected $table = 'event_attendees';
 
+    const CREATED_AT = 'createdAt';
+    const UPDATED_AT = 'updatedAt';
+
     protected $casts = [
         'userId' => 'int',
         'eventId' => 'int',
+        'attendedAt' => 'datetime',
         'registeredAt' => 'datetime',
     ];
 

@@ -54,3 +54,13 @@ public function canBeBooked(): bool   // Domain rule: booking eligibility
 ```
 
 // This works regardless of WHERE the data is stored
+
+# Phinx
+
+## Migrations
+
+Run single commands without logging in
+```
+  docker-compose exec server php vendor/bin/phinx status
+  docker-compose exec server php vendor/bin/phinx migrate
+```

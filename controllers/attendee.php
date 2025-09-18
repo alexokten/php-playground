@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
+use Ramsey\Uuid\Uuid;
 
 /** Remaining tasks:
   1. getAttendeeEvents() - Show which events a Attendee is registered for
@@ -42,9 +43,11 @@ class AttendeeController
 
     public function store(): JsonResponse
     {
+        $uuid = bin2hex(random_bytes((16)));
         $Attendee = Attendee::create([
             'firstName' => 'Jeff',
             'lastName' => 'Hat',
+            'email' => 'example' . $uuid . 'example.com',
             'dateOfBirth' => Carbon::createFromFormat('d/m/Y', '19/10/2020'),
             'city' => 'Bristol',
             'isActive' => true,
@@ -68,8 +71,8 @@ class AttendeeController
 
     public function getsAttendeeEvents(string $id): JsonResponse
     {
-        $Attendee = Attendee::where('id', $id)->with('events')->get();
-        ray($Attendee->toArray());
-        return new JsonResponse($Attendee);
+        $attendee = Attendee::with('events')->find($id);
+        $events = $attendee->events;
+        return new JsonResponse($events);
     }
 }

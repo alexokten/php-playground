@@ -14,6 +14,7 @@ class Attendee extends Model
     protected $fillable = [
         'firstName',
         'lastName',
+        'email',
         'dateOfBirth',
         'city',
         'isActive',
@@ -24,18 +25,20 @@ class Attendee extends Model
         return [
             'firstName' => 'string',
             'lastName' => 'string',
+            'email' => 'string',
             'dateOfBirth' => 'datetime',
             'city' => 'string',
             'isActive' => 'bool',
         ];
     }
 
+
     public function events()
     {
         return $this->belongsToMany(
             Event::class,
-            'event_attendees',
-            'userId',
+            'events_attendees',
+            'attendeeId',
             'eventId'
         );
     }
