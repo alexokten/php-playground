@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 use Illuminate\Database\Eloquent\Model;
 
-class Attendee extends Model
+
+/** TODO: Function to return venues that promoter promotes */
+
+class Promoter extends Model
 {
-    protected $table = 'attendees';
+    protected $table = 'promoter';
 
     const CREATED_AT = 'createdAt';
     const UPDATED_AT = 'updatedAt';
@@ -19,7 +22,7 @@ class Attendee extends Model
         'isActive',
     ];
 
-    protected function casts()
+    protected function cast()
     {
         return [
             'firstName' => 'string',
@@ -34,7 +37,7 @@ class Attendee extends Model
     {
         return $this->belongsToMany(
             Event::class,
-            'event_attendees',
+            'event_promoters',
             'userId',
             'eventId'
         );

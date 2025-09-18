@@ -17,13 +17,16 @@ class Event extends Model
         'isActive'
     ];
 
-    protected $casts = [
-        'eventDate' => 'datetime',
-        'isActive' => 'boolean',
-        'maxTickets' => 'integer',
-        'createdAt' => 'datetime',
-        'updatedAt' => 'datetime'
-    ];
+    protected function cast()
+    {
+        return [
+            'eventDate' => 'datetime',
+            'isActive' => 'boolean',
+            'maxTickets' => 'integer',
+            'createdAt' => 'datetime',
+            'updatedAt' => 'datetime'
+        ];
+    }
 
     protected $attributes = [
         'isActive' => true,
