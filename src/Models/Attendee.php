@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace App\Models;
+
 use Illuminate\Database\Eloquent\Model;
 
 class Attendee extends Model
@@ -33,23 +35,42 @@ class Attendee extends Model
     }
 
 
-    public function eventsExcludingUnregistered()
+    public function events()
     {
         return $this->belongsToMany(
             Event::class,
             'events_attendees',
             'attendeeId',
             'eventId'
-        )->wherePivotNull('unregisteredAt');
+        )->withPivot([
+            'registeredAt',
+            'unregisteredAt',
+            'attendedAt'
+        ]);
     }
 
-    public function allEventsRegistered()
+    public function activeEvents()
     {
         return $this->belongsToMany(
             Event::class,
             'events_attendees',
             'attendeeId',
             'eventId'
-        )->withPivot(['registeredAt', 'unregisteredAt']);
+        )->wherePivotNull('unregisteredAt')
+            ->withPivot([
+                'registeredAt',
+                'unregisteredAt',
+                'attendedAt'
+            ]);
+    }
+
+    public function allEventHistory()
+    {
+        return $this->belongsToMany(
+            Event::class,
+            'events_attendees',
+            'attendeeId',
+            'eventId'
+        )->withPivot(['registeredAt', 'unregisteredAt', 'attendedAt']);
     }
 }

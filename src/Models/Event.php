@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace App\Models;
+
 use Illuminate\Database\Eloquent\Model;
 
 class Event extends Model
@@ -36,10 +38,10 @@ class Event extends Model
     public function attendees()
     {
         return $this->belongsToMany(
-            Event::class,
+            Attendee::class,
             'events_attendees',
             'eventId',
             'attendeeId'
-        );
+        )->withPivot(['registeredAt', 'unregisteredAt', 'attendedAt']);
     }
 }

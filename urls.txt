@@ -1,4 +1,0 @@
-# API endpoints to trigger when PHP files change
-# One URL per line, use # for comments
-
-http://localhost:8080/api/attendee/FBA010F5

@@ -4,77 +4,31 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../router.php';
-require_once __DIR__ . '/../controllers/attendee.php';
-require_once __DIR__ . '/../models/attendee.php';
-require_once __DIR__ . '/../models/event.php';
 require_once __DIR__ . '/../database/connection.php';
 
 ray()->clearAll();
 
-use Illuminate\Http\JsonResponse;
+use App\Controllers\AttendeeController;
+use App\Helpers\Response;
 
 try {
 
     $router = new Router();
-    $router->get('/api/attendees/all', function ($req, $res) {
-        $attendee = new AttendeeController();
-        $response = $attendee->index();
-        ray()->toJson($response);
-        $res::sendResponse();
-    });
+    $router
+        ->get('/api/attendees', [AttendeeController::class, 'getAllAttendees'])
+        ->get('/api/attendee/:id', [AttendeeController::class, 'getAttendeeById']);
 
-    $router->get('/api/attendee/id/:attendeeId', function ($req, $res) {
-        $attendee = new AttendeeController();
-        $response = $attendee->show($req->params[':attendeeId']);
-        ray()->toJson($response);
-        $res::sendResponse();
-    });
+    // $router->post('/api/attendee/create', [AttendeeController::class, 'createAttendee']);
+    // $router->put('/api/attendee/update/:attendeeId', [AttendeeController::class, 'updateAttendee']);
+    // $router->delete('/api/attendee/delete/:attendeeId', [AttendeeController::class, 'deleteAttendee']);
 
-    $router->get('/api/attendee/create', function ($req, $res) {
-        $attendee = new AttendeeController();
-        $response = $attendee->store();
-        ray()->toJson($response);
-        $res::sendResponse();
-    });
-
-    $router->get('/api/attendee/update/:attendeeId', function ($req, $res) {
-        $attendee = new AttendeeController();
-        $response = $attendee->update($req->params[':attendeeId']);
-        ray()->toJson($response);
-        $res::sendResponse();
-    });
-
-    $router->get('/api/attendee/delete/:attendeeId', function ($req, $res) {
-        $attendee = new AttendeeController();
-        $response = $attendee->delete($req->params[':attendeeId']);
-        ray()->toJson($response);
-        $res::sendResponse();
-    });
-
-    $router->get('/api/events/:attendeeId', function ($req, $res) {
-        $attendee = new AttendeeController();
-        $response = $attendee->getsAttendeeEvents($req->params[':attendeeId']);
-        ray()->toJson($response);
-        $res::sendResponse();
-    });
-
-
-    $router->get('/api/events/register/:eventId/:attendeeId', function ($req, $res) {
-        [':eventId' => $eventId, ':attendeeId' => $attendeeId] = $req->params;
-        $response = new AttendeeController()->registerForEvent($attendeeId, $eventId);
-        $res::sendResponse(responseJson: $response);
-    });
-
-    $router->get('/api/events/unregister/:eventId/:attendeeId', function ($req, $res) {
-        [':eventId' => $eventId, ':attendeeId' => $attendeeId] = $req->params;
-        $response = new AttendeeController()->unregisterForEvent($attendeeId, $eventId);
-        $res::sendResponse(responseJson: $response);
-    });
+    // $router->get('/api/events/:attendeeId', [AttendeeController::class, 'getAttendeeEvents']);
+    // $router->get('/api/events/register/:eventId/:attendeeId', [AttendeeController::class, 'registerForEvent']);
+    // $router->get('/api/events/unregister/:eventId/:attendeeId', [AttendeeController::class, 'unregisterForEvent']);
 
     $router->dispatch();
 } catch (Exception $e) {
     if ($_ENV['APP_ENV'] === 'development') {
         ray($e);
     }
-    /** else log to sentry */
 }

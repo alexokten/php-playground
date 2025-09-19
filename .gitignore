@@ -2,3 +2,5 @@
 /vendor
 .DS_Store
 CLAUDE.md
+/database/migrations
+/database/seeders

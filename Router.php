@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Spatie\Regex\Regex;
-use Illuminate\Http\JsonResponse;
+use App\Helpers\Response;
 
 class RouterUtils
 {
@@ -20,26 +20,59 @@ class RouteItem
     public string $method;
     public string $slug;
     public $callback;
+    public ?string $controllerClass = null;
+    public ?string $controllerMethod = null;
 
     public function __construct(
         string $method,
         string $slug,
-        callable $callback
+        callable | array $callback
     ) {
         $this->method = $method;
         $this->slug = $slug;
         $this->callback = $callback;
+
+        if (is_array($callback)) {
+            $this->controllerClass = $callback[0];
+            $this->controllerMethod = $callback[1];
+        }
+    }
+
+    public static function get(string $slug, array | callable $callback)
+    {
+        return new self('GET', $slug, $callback);
+    }
+
+    public static function post(string $slug, array | callable $callback)
+    {
+        return new self('POST', $slug, $callback);
+    }
+
+    public static function put(string $slug, array | callable $callback)
+    {
+        return new self('PUT', $slug, $callback);
+    }
+
+    public static function delete(string $slug, array | callable $callback)
+    {
+        return new self('DELETE', $slug, $callback);
+    }
+
+    public function isControllerFunction(): bool
+    {
+        return $this->controllerClass !== null;
     }
 }
 
 class RequestItem
 {
-    public array $params;
-
-    public function __construct(array $params)
-    {
-        $this->params = $params;
-    }
+    public function __construct(
+        public string $method,
+        public string $url,
+        public array $headers = [],
+        public string $body = '',
+        public array $params = []
+    ) {}
 }
 
 class ResponseItem
@@ -58,59 +91,13 @@ class Router
 
     public function dispatch(): void
     {
-        $incomingUrl = $_SERVER['REQUEST_URI'];
+        $request = RequestFactory::createFromGlobals();
+        $route = $this->findMatchingRoute($request->url, $request->method);
 
-        $matchedRoute = $this->findMatchingRoute($incomingUrl);
+        $request->params = $this->extractUrlParameters($route->slug, $request->url);
 
-        $this->verifyHttpMethod($matchedRoute->method);
-
-        $urlParameters = $this->extractUrlParameters($matchedRoute->slug, $incomingUrl);
-
-        $request = new RequestItem($urlParameters);
-        $response = new ResponseItem();
-
-        $routeHandler = $matchedRoute->callback;
-        $routeHandler($request, $response);
-    }
-
-    public function get(string $urlPattern, callable $routeHandler): void
-    {
-        $routeItem = new RouteItem(
-            method: 'GET',
-            slug: $urlPattern,
-            callback: $routeHandler
-        );
-        $this->registerRoute($routeItem);
-    }
-
-    public function post(string $urlPattern, callable $routeHandler): void
-    {
-        $routeItem = new RouteItem(
-            method: 'POST',
-            slug: $urlPattern,
-            callback: $routeHandler
-        );
-        $this->registerRoute($routeItem);
-    }
-
-    public function put(string $urlPattern, callable $routeHandler): void
-    {
-        $routeItem = new RouteItem(
-            method: 'PUT',
-            slug: $urlPattern,
-            callback: $routeHandler
-        );
-        $this->registerRoute($routeItem);
-    }
-
-    public function delete(string $urlPattern, callable $routeHandler): void
-    {
-        $routeItem = new RouteItem(
-            method: 'DELETE',
-            slug: $urlPattern,
-            callback: $routeHandler
-        );
-        $this->registerRoute($routeItem);
+        $controller = new $route->controllerClass();
+        $controller->{$route->controllerMethod}($request);
     }
 
     private function registerRoute(RouteItem $routeDefinition): void
@@ -118,9 +105,36 @@ class Router
         array_push($this->registeredRoutes, $routeDefinition);
     }
 
-    private function findMatchingRoute(string $incomingUrlPath): RouteItem
+    public function get(string $urlPattern, array | callable $callback): Router
+    {
+        $routeItem = RouteItem::get(slug: $urlPattern, callback: $callback);
+        $this->registerRoute($routeItem);
+        return $this;
+    }
+
+    public function post(string $urlPattern, array | callable $callback): void
+    {
+        $routeItem = RouteItem::get(slug: $urlPattern, callback: $callback);
+        $this->registerRoute($routeItem);
+    }
+
+    public function put(string $urlPattern, array | callable $callback): void
+    {
+        $routeItem = RouteItem::get(slug: $urlPattern, callback: $callback);
+        $this->registerRoute($routeItem);
+    }
+
+    public function delete(string $urlPattern, array | callable $callback): void
+    {
+        $routeItem = RouteItem::get(slug: $urlPattern, callback: $callback);
+        $this->registerRoute($routeItem);
+    }
+
+    private function findMatchingRoute(string $incomingUrlPath, string $method): RouteItem
     {
         $utils = new RouterUtils();
+
+        $this->verifyHttpMethod($method);
 
         foreach ($this->registeredRoutes as $candidateRoute) {
             if ($candidateRoute->slug === $incomingUrlPath) {
@@ -188,5 +202,18 @@ class Router
             }
         }
         return $extractedParameters;
+    }
+}
+
+class RequestFactory
+{
+    public static function createFromGlobals(): RequestItem
+    {
+        return new RequestItem(
+            method: $_SERVER['REQUEST_METHOD'],
+            url: $_SERVER['REQUEST_URI'],
+            headers: getallheaders(),
+            body: file_get_contents('php://input')
+        );
     }
 }
