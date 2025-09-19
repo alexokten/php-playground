@@ -1,0 +1,21 @@
+  {
+      "diagnostics": {
+          "unusedSymbols": false,
+          "undefinedVariables": false,
+          "undefinedTypes": true,
+          "undefinedFunctions": true,
+          "undefinedConstants": true,
+          "undefinedClassConstants": true,
+          "undefinedMethods": true,
+          "undefinedProperties": true
+      },
+      "environment": {
+          "phpVersion": "8.2.0"
+      },
+      "files": {
+          "exclude": [
+              "**/vendor/**",
+              "**/node_modules/**"
+          ]
+      }
+  }
