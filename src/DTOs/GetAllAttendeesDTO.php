@@ -6,10 +6,10 @@ namespace App\DTOs;
 
 use InvalidArgumentException;
 
-class GetAttendeeDTO
+class CreateAttendeeDTO
 {
     public function __construct(
-        public readonly int | string $attendeeId
+        public readonly int $attendeeId
     ) {
         if ($attendeeId < 0) {
             throw new InvalidArgumentException('attendeeId must be greater than 0');

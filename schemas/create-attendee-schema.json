@@ -1,0 +1,34 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"type": "object",
+	"required": ["firstName", "lastName", "email", "dateOfBirth", "city"],
+	"properties": {
+		"firstName": {
+			"type": "string",
+			"minLength": 1,
+			"maxLength": 50
+		},
+		"lastName": {
+			"type": "string",
+			"minLength": 1,
+			"maxLength": 50
+		},
+		"email": {
+			"type": "string",
+			"format": "email"
+		},
+		"dateOfBirth": {
+			"type": "string",
+			"format": "date"
+		},
+		"city": {
+			"type": "string",
+			"minLength": 1
+		},
+		"isActive": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"additionalProperties": false
+}

@@ -114,7 +114,7 @@ class Router
 
     public function post(string $urlPattern, array | callable $callback): void
     {
-        $routeItem = RouteItem::get(slug: $urlPattern, callback: $callback);
+        $routeItem = RouteItem::post(slug: $urlPattern, callback: $callback);
         $this->registerRoute($routeItem);
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\DTOs\CreateAttendeeDTO;
 use App\DTOs\GetAttendeeDTO;
 use App\Helpers\Response;
 use App\Models\Attendee;
@@ -25,31 +26,30 @@ class AttendeeController
 
     public function getAttendeeById(RequestItem $request): void
     {
-        $dto = new GetAttendeeDTO(attendeeId: (int)$request->params[':id']);
+        $dto = new GetAttendeeDTO(attendeeId: $request->params[':id']);
         $attendeeWithId = Attendee::find($dto->attendeeId);
         Response::sendSuccess([$attendeeWithId], 'Attendee retrieved successfully');
     }
 
-    public function createAttendee(): array
+    public function createAttendee(RequestItem $request): void
     {
-        $uuid = bin2hex(random_bytes((16)));
-        $attendee = Attendee::create([
-            'firstName' => 'Jeff',
-            'lastName' => 'Hat',
-            'email' => 'example' . $uuid . 'example.com',
-            'dateOfBirth' => Carbon::createFromFormat('d/m/Y', '19/10/2020'),
-            'city' => 'Bristol',
-            'isActive' => true,
-        ]);
-        return Response::success($attendee->toArray(), 'Attendee created successfully');
+        $dto = CreateAttendeeDTO::fromRequestBody($request->body);
+
+        if (Attendee::where('email', $dto->email)->exists()) {
+            Response::sendError('User already exists', 409);
+            return;
+        };
+
+        Attendee::create($dto->toArray());
+        Response::sendSuccess($dto->toArray(), 'Attendee created successfully');
     }
 
-    public function updateAttendee(string $attendeeId): array
+    public function updateAttendee(RequestItem $request): void
     {
-        $attendee = Attendee::find($attendeeId, 'id')->update(
+        $attendee = Attendee::find($request->body['id'], 'id')->update(
             ['firstName' => 'Chick', 'lastName' => 'Peas']
         );
-        return Response::success(['updated' => $attendee], 'Attendee updated successfully');
+        Response::sendSuccess(['updated' => $attendee], 'Attendee updated successfully');
     }
 
     public function deleteAttendee(string $attendeeId): array

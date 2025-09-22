@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Headfirst - PHP Playground",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

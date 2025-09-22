@@ -1,0 +1,12 @@
+<?php
+
+return [
+    'mapping' => [
+        'CreateAttendeeSchema' => [
+            'json-schema-file' => __DIR__ . '/schemas/create-attendee-schema.json',
+            'directory' => __DIR__ . '/src/GeneratedDTOs',
+            'namespace' => 'App\\GeneratedDTOs',
+            'root-class' => 'CreateAttendee',
+        ]
+    ],
+];

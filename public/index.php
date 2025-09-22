@@ -9,14 +9,14 @@ require_once __DIR__ . '/../database/connection.php';
 ray()->clearAll();
 
 use App\Controllers\AttendeeController;
-use App\Helpers\Response;
 
 try {
 
     $router = new Router();
     $router
         ->get('/api/attendees', [AttendeeController::class, 'getAllAttendees'])
-        ->get('/api/attendee/:id', [AttendeeController::class, 'getAttendeeById']);
+        ->get('/api/attendee/get/:id', [AttendeeController::class, 'getAttendeeById'])
+        ->post('/api/attendee/create', [AttendeeController::class, 'createAttendee']);
 
     // $router->post('/api/attendee/create', [AttendeeController::class, 'createAttendee']);
     // $router->put('/api/attendee/update/:attendeeId', [AttendeeController::class, 'updateAttendee']);
