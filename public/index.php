@@ -16,17 +16,12 @@ try {
     $router
         ->get('/api/attendees', [AttendeeController::class, 'getAllAttendees'])
         ->get('/api/attendee/get/:id', [AttendeeController::class, 'getAttendeeById'])
-        ->post('/api/attendee/create', [AttendeeController::class, 'createAttendee']);
-
-    /** TODO: Finish these
-    $router->post('/api/attendee/create', [AttendeeController::class, 'createAttendee']);
-    $router->put('/api/attendee/update/:attendeeId', [AttendeeController::class, 'updateAttendee']);
-    $router->delete('/api/attendee/delete/:attendeeId', [AttendeeController::class, 'deleteAttendee']);
-
-    $router->get('/api/events/:attendeeId', [AttendeeController::class, 'getAttendeeEvents']);
-    $router->get('/api/events/register/:eventId/:attendeeId', [AttendeeController::class, 'registerForEvent']);
-    $router->get('/api/events/unregister/:eventId/:attendeeId', [AttendeeController::class, 'unregisterForEvent']);
-     */
+        ->get('/api/attendee/events', [AttendeeController::class, 'getAttendeeEvents'])
+        ->post('/api/attendee/create', [AttendeeController::class, 'createAttendee'])
+        ->put('/api/attendee/update', [AttendeeController::class, 'updateAttendee'])
+        ->put('/api/attendee/delete', [AttendeeController::class, 'anonymiseAttendee'])
+        ->post('/api/event/register', [AttendeeController::class, 'registerForEvent'])
+        ->post('/api/event/unregister', [AttendeeController::class, 'unRegisterForEvent']);
 
     $router->dispatch();
 } catch (Exception $e) {
