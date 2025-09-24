@@ -12,7 +12,9 @@ class GetAttendeeDTO
         public readonly int | string $attendeeId
     ) {
         if ($attendeeId < 0) {
-            throw new InvalidArgumentException('attendeeId must be greater than 0');
+            throw new InvalidArgumentException(
+                'attendeeId must be greater than 0'
+            );
         }
     }
 }

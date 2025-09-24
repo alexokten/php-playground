@@ -6,7 +6,7 @@ namespace App\DTOs;
 
 use InvalidArgumentException;
 
-class CreateAttendeeDTO
+class GetAllAttendeesDTO
 {
     public function __construct(
         public readonly int $attendeeId
