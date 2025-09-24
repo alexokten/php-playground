@@ -146,7 +146,6 @@ class Router
             $routeSegments = explode('/', $candidateRoute->slug);
             $urlSegments = explode('/', $incomingUrlPath);
 
-            /** INFO: Restart loop */
             if (count($routeSegments) !== count($urlSegments)) {
                 continue;
             }
