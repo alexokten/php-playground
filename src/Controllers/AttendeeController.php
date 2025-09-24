@@ -33,14 +33,15 @@ class AttendeeController
 
     public function createAttendee(RequestItem $request): void
     {
-        $dto = CreateAttendeeDTO::fromRequestBody($request->body);
+        $dto = CreateAttendeeDTO::create($request);
 
         if (Attendee::where('email', $dto->email)->exists()) {
             Response::sendError('User already exists', 409);
             return;
+        } else {
+            Attendee::create($dto->toArray());
         };
 
-        Attendee::create($dto->toArray());
         Response::sendSuccess($dto->toArray(), 'Attendee created successfully');
     }
 
