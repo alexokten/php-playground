@@ -53,7 +53,7 @@ public function isPast(): bool        // Domain rule: what makes an event "past"
 public function canBeBooked(): bool   // Domain rule: booking eligibility
 ```
 
-// This works regardless of WHERE the data is stored
+This works regardless of WHERE the data is stored
 
 # Phinx
 
