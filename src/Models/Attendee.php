@@ -24,6 +24,7 @@ class Attendee extends Model
             'dateOfBirth' => 'datetime',
             'city' => 'string',
             'isActive' => 'bool',
+            'anonymisedAt' => 'datetime',
         ];
     }
 
