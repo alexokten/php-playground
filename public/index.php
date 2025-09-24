@@ -6,9 +6,9 @@ require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../router.php';
 require_once __DIR__ . '/../database/connection.php';
 
-ray()->clearAll();
-
 use App\Controllers\AttendeeController;
+
+ray()->clearAll();
 
 try {
 
@@ -18,17 +18,20 @@ try {
         ->get('/api/attendee/get/:id', [AttendeeController::class, 'getAttendeeById'])
         ->post('/api/attendee/create', [AttendeeController::class, 'createAttendee']);
 
-    // $router->post('/api/attendee/create', [AttendeeController::class, 'createAttendee']);
-    // $router->put('/api/attendee/update/:attendeeId', [AttendeeController::class, 'updateAttendee']);
-    // $router->delete('/api/attendee/delete/:attendeeId', [AttendeeController::class, 'deleteAttendee']);
+    /** TODO: Finish these
+    $router->post('/api/attendee/create', [AttendeeController::class, 'createAttendee']);
+    $router->put('/api/attendee/update/:attendeeId', [AttendeeController::class, 'updateAttendee']);
+    $router->delete('/api/attendee/delete/:attendeeId', [AttendeeController::class, 'deleteAttendee']);
 
-    // $router->get('/api/events/:attendeeId', [AttendeeController::class, 'getAttendeeEvents']);
-    // $router->get('/api/events/register/:eventId/:attendeeId', [AttendeeController::class, 'registerForEvent']);
-    // $router->get('/api/events/unregister/:eventId/:attendeeId', [AttendeeController::class, 'unregisterForEvent']);
+    $router->get('/api/events/:attendeeId', [AttendeeController::class, 'getAttendeeEvents']);
+    $router->get('/api/events/register/:eventId/:attendeeId', [AttendeeController::class, 'registerForEvent']);
+    $router->get('/api/events/unregister/:eventId/:attendeeId', [AttendeeController::class, 'unregisterForEvent']);
+     */
 
     $router->dispatch();
 } catch (Exception $e) {
     if ($_ENV['APP_ENV'] === 'development') {
+        echo $e;
         ray($e);
     }
 }

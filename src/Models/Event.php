@@ -10,14 +10,10 @@ class Event extends Model
 {
     protected $table = 'events';
 
-    protected $fillable = [
-        'title',
-        'description',
-        'eventDate',
-        'location',
-        'maxTickets',
-        'isActive'
-    ];
+    const CREATED_AT = 'createdAt';
+    const UPDATED_AT = 'updatedAt';
+
+    protected $guarded = ['id', 'createdAt', 'updatedAt'];
 
     protected function cast()
     {

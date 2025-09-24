@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Helpers;
 
-use Carbon\Carbon;
-
+use App\DTOs\SuccessDTO;
+use App\DTOs\ErrorDTO;
 
 class Response
 {
@@ -16,28 +16,12 @@ class Response
 
     public static function success(array $data, string $message = "Successful response message"): array
     {
-        return [
-            'success' => true,
-            'message' => $message,
-            'data' => [
-                ...$data,
-                'timestamp' => Carbon::now()->toISOString()
-            ],
-            'status_code' => self::HTTP_OK
-        ];
+        return SuccessDTO::create($data, $message)->toArray();
     }
 
     public static function error(string $message = "An error occurred", int $statusCode = self::HTTP_INTERNAL_SERVER_ERROR, array $data = []): array
     {
-        return [
-            'success' => false,
-            'message' => $message,
-            'data' => [
-                ...$data,
-                'timestamp' => Carbon::now()->toISOString()
-            ],
-            'status_code' => $statusCode
-        ];
+        return ErrorDTO::create($data, $message, $statusCode)->toArray();
     }
 
     public static function sendSuccess(array $data, string $message = "Success"): void
@@ -54,9 +38,11 @@ class Response
 
     private static function sendJson(array $data): void
     {
-        http_response_code($data['status_code'] ?? 200);
         header('Content-Type: application/json');
         header('Cache-Control: no-cache, must-revalidate');
+
+        http_response_code($data['status_code'] ?? 200);
+
         echo json_encode($data, JSON_THROW_ON_ERROR);
         exit;
     }

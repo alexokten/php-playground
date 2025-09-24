@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace App\Models;
+
 use Illuminate\Database\Eloquent\Model;
 
 class Venues extends Model
@@ -11,12 +13,7 @@ class Venues extends Model
     const CREATED_AT = 'createdAt';
     const UPDATED_AT = 'updatedAt';
 
-    protected $fillable = [
-        'name',
-        'location',
-        'maxCapacity',
-        'isActive',
-    ];
+    protected $guarded = ['id', 'createdAt', 'updatedAt'];
 
     protected function casts()
     {

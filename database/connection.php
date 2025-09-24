@@ -9,7 +9,7 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
 use Dotenv\Dotenv;
 
-// Load environment variables (prefer local if exists)
+/** 1 - Load environment variables (prefer local if exists) */
 $dotenv = Dotenv::createImmutable(__DIR__ . '/..');
 if (file_exists(__DIR__ . '/../.env.local')) {
     $dotenv->load('.env.local');
@@ -17,10 +17,10 @@ if (file_exists(__DIR__ . '/../.env.local')) {
     $dotenv->load();
 }
 
-// Create Capsule instance
+/** 2 - Create Capsule instance */
 $capsule = new Capsule;
 
-// Add database connection
+/** 3 - Add database connection */
 $capsule->addConnection([
     'driver' => 'mysql',
     'host' => $_ENV['DB_HOST'],
@@ -33,11 +33,11 @@ $capsule->addConnection([
     'prefix' => '',
 ]);
 
-// Set the event dispatcher used by Eloquent models
+/** 4 - Set the event dispatcher used by Eloquent models */
 $capsule->setEventDispatcher(new Dispatcher(new Container));
 
-// Make this Capsule instance available globally via static methods
+/** 5 - Make this Capsule instance available globally via static methods */
 $capsule->setAsGlobal();
 
-// Setup the Eloquent ORM
+/** 6 - Setup the Eloquent ORM */
 $capsule->bootEloquent();

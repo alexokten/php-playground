@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
+namespace App\Models;
+
 use Illuminate\Database\Eloquent\Model;
-
-
-/** TODO: Function to return venues that promoter promotes */
 
 class Promoter extends Model
 {
@@ -14,14 +13,7 @@ class Promoter extends Model
     const CREATED_AT = 'createdAt';
     const UPDATED_AT = 'updatedAt';
 
-    protected $fillable = [
-        'firstName',
-        'lastName',
-        'email',
-        'dateOfBirth',
-        'city',
-        'isActive',
-    ];
+    protected $guarded = ['id', 'createdAt', 'updatedAt'];
 
     protected function cast()
     {

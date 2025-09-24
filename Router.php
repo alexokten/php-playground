@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Spatie\Regex\Regex;
-use App\Helpers\Response;
 
 class RouterUtils
 {
@@ -112,22 +111,25 @@ class Router
         return $this;
     }
 
-    public function post(string $urlPattern, array | callable $callback): void
+    public function post(string $urlPattern, array | callable $callback): Router
     {
         $routeItem = RouteItem::post(slug: $urlPattern, callback: $callback);
         $this->registerRoute($routeItem);
+        return $this;
     }
 
-    public function put(string $urlPattern, array | callable $callback): void
+    public function put(string $urlPattern, array | callable $callback): Router
     {
         $routeItem = RouteItem::get(slug: $urlPattern, callback: $callback);
         $this->registerRoute($routeItem);
+        return $this;
     }
 
-    public function delete(string $urlPattern, array | callable $callback): void
+    public function delete(string $urlPattern, array | callable $callback): Router
     {
         $routeItem = RouteItem::get(slug: $urlPattern, callback: $callback);
         $this->registerRoute($routeItem);
+        return $this;
     }
 
     private function findMatchingRoute(string $incomingUrlPath, string $method): RouteItem
@@ -144,6 +146,7 @@ class Router
             $routeSegments = explode('/', $candidateRoute->slug);
             $urlSegments = explode('/', $incomingUrlPath);
 
+            /** INFO: Restart loop */
             if (count($routeSegments) !== count($urlSegments)) {
                 continue;
             }
@@ -168,22 +171,24 @@ class Router
                 return $candidateRoute;
             }
         }
+
         throw new Exception('Route not matched');
     }
 
     private function verifyHttpMethod(string $expectedHttpMethod): bool
     {
-        $actualHttpMethod = $_SERVER['REQUEST_METHOD'];
+        $request = RequestFactory::createFromGlobals();
+        $actualHttpMethod = $request->method;
+
         if ($expectedHttpMethod !== $actualHttpMethod) {
             throw new Exception('Request method does not match');
         }
+
         return true;
     }
 
     private function extractUrlParameters(string $routePattern, string $actualUrl): array
     {
-        $utils = new RouterUtils();
-
         $extractedParameters = [];
 
         $routeSegments = explode('/', $routePattern);
@@ -193,7 +198,7 @@ class Router
             $routeSegment = $routeSegments[$segmentIndex];
             $urlSegment = $urlSegments[$segmentIndex];
 
-            if ($utils->matchParamPattern($routeSegment)) {
+            if (RouterUtils::matchParamPattern($routeSegment)) {
                 $extractedParameters += [$routeSegment => $urlSegment];
             }
 

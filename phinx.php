@@ -4,7 +4,6 @@ require_once 'vendor/autoload.php';
 
 use Dotenv\Dotenv;
 
-// Load environment variables
 $dotenv = Dotenv::createImmutable(__DIR__);
 if (file_exists(__DIR__ . '/.env.local')) {
     $dotenv->load('.env.local');

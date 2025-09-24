@@ -13,14 +13,7 @@ class Attendee extends Model
     const CREATED_AT = 'createdAt';
     const UPDATED_AT = 'updatedAt';
 
-    protected $fillable = [
-        'firstName',
-        'lastName',
-        'email',
-        'dateOfBirth',
-        'city',
-        'isActive',
-    ];
+    protected $guarded = ['id', 'createdAt', 'updatedAt'];
 
     protected function casts()
     {
@@ -42,11 +35,7 @@ class Attendee extends Model
             'events_attendees',
             'attendeeId',
             'eventId'
-        )->withPivot([
-            'registeredAt',
-            'unregisteredAt',
-            'attendedAt'
-        ]);
+        )->withPivot(['registeredAt', 'unregisteredAt', 'attendedAt']);
     }
 
     public function activeEvents()
@@ -57,11 +46,7 @@ class Attendee extends Model
             'attendeeId',
             'eventId'
         )->wherePivotNull('unregisteredAt')
-            ->withPivot([
-                'registeredAt',
-                'unregisteredAt',
-                'attendedAt'
-            ]);
+            ->withPivot(['registeredAt', 'unregisteredAt', 'attendedAt']);
     }
 
     public function allEventHistory()
@@ -71,6 +56,8 @@ class Attendee extends Model
             'events_attendees',
             'attendeeId',
             'eventId'
-        )->withPivot(['registeredAt', 'unregisteredAt', 'attendedAt']);
+        )->withPivot(
+            ['registeredAt', 'unregisteredAt', 'attendedAt']
+        );
     }
 }
