@@ -15,10 +15,7 @@ class CreateAttendeeDTO
         public readonly string $dateOfBirth, // ISO format: YYYY-MM-DD
         public readonly string $city,
         public readonly bool $isActive = true
-    ) {
-        // Brick JsonMapper will handle validation automatically
-        // based on the type declarations above
-    }
+    ) {}
 
     public function toArray(): array
     {
