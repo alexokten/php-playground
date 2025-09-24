@@ -1,0 +1,23 @@
+meta {
+  name: UpdateAttendee
+  type: http
+  seq: 7
+}
+
+put {
+  url: http://localhost:8080/api/attendee/update
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "firstName": "JohnUpdated",
+    "lastName": "DoeUpdated",
+    "id": 16
+  }
+}
+
+settings {
+  encodeUrl: true
+}

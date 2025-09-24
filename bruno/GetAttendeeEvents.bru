@@ -1,0 +1,21 @@
+meta {
+  name: GetAttendeeEvents
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:8080/api/attendee/events
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+   "id": 16,
+  }
+}
+
+settings {
+  encodeUrl: true
+}

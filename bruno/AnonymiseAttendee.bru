@@ -1,0 +1,21 @@
+meta {
+  name: AnonymiseAttendee
+  type: http
+  seq: 8
+}
+
+put {
+  url: http://localhost:8080/api/attendee/delete
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": 21
+  }
+}
+
+settings {
+  encodeUrl: true
+}
