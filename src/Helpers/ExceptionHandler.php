@@ -2,8 +2,13 @@
 
 declare(strict_types=1);
 
+namespace App\Helpers;
+
 use App\Helpers\Response;
 use Brick\JsonMapper\JsonMapperException;
+use InvalidArgumentException;
+use RuntimeException;
+use Throwable;
 
 class ExceptionHandler
 {

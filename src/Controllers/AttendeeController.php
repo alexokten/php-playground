@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\DTOs\CreateAttendeeDTO;
-use App\DTOs\UpdateAttendeeDTO;
 use App\DTOs\GetAttendeeDTO;
 use App\DTOs\RegisterForEventDTO;
+use App\DTOs\UpdateAttendeeDTO;
+use App\Helpers\ExceptionHandler;
 use App\Helpers\Response;
-use App\Services\AttendeeService;
 use App\Repositories\AttendeeRepository;
+use App\Services\AttendeeService;
 use Brick\JsonMapper\JsonMapper;
-use ExceptionHandler;
 use RequestItem;
 use Throwable;
 
@@ -59,6 +59,7 @@ class AttendeeController
 
     public function createAttendee(RequestItem $request): void
     {
+        ray('hey');
         try {
             $dto = $this->jsonMapper->map($request->body, CreateAttendeeDTO::class);
             $result = $this->attendeeService->createAttendee($dto);

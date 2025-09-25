@@ -17,20 +17,6 @@ class CreateAttendeeDTO
         public readonly bool $isActive = true
     ) {}
 
-    /** INFO: Replaced by JSONMapper
-    public static function create(RequestItem $request)
-    {
-        $data = json_decode($request->body, true);
-        return new self(
-            firstName: $data['firstName'],
-            lastName: $data['lastName'],
-            email: $data['email'],
-            dateOfBirth: $data['dateOfBirth'],
-            city: $data['city'],
-            isActive: $data['isActive'],
-        );
-    } */
-
     public function toArray(): array
     {
         return [
