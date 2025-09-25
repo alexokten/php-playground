@@ -6,184 +6,130 @@ namespace App\Controllers;
 
 use App\DTOs\CreateAttendeeDTO;
 use App\DTOs\UpdateAttendeeDTO;
-use App\DTOs\AnonymiseAttendeeDTO;
 use App\DTOs\GetAttendeeDTO;
 use App\DTOs\RegisterForEventDTO;
 use App\Helpers\Response;
-use App\Models\Attendee;
-use App\Models\Event;
+use App\Services\AttendeeService;
+use App\Repositories\AttendeeRepository;
 use Brick\JsonMapper\JsonMapper;
-use Illuminate\Support\Carbon;
+use ExceptionHandler;
 use RequestItem;
+use Throwable;
 
 header('Content-Type: application/json');
 header('Cache-Control: no-cache, must-revalidate');
 
 class AttendeeController
 {
-    public static function getAllAttendees(): void
+    private readonly AttendeeService $attendeeService;
+    private readonly JsonMapper $jsonMapper;
+
+    public function __construct()
     {
-        $attendees = Attendee::all();
-        Response::sendSuccess(
-            [
-                $attendees->toArray()
-            ],
-            'Attendees retrieved successfully'
-        );
+        $this->attendeeService = new AttendeeService(new AttendeeRepository());
+        $this->jsonMapper = new JsonMapper();
+    }
+
+    public function getAllAttendees(): void
+    {
+        try {
+            $attendees = $this->attendeeService->getAllAttendees();
+            Response::sendSuccess(
+                [$attendees->toArray()],
+                'Attendees retrieved successfully'
+            );
+        } catch (Throwable $e) {
+            ExceptionHandler::handle($e);
+        }
     }
 
     public function getAttendeeById(RequestItem $request): void
     {
-        $dto = new GetAttendeeDTO((int)$request->params[':id']);
-        $attendeeWithId = Attendee::find($dto->id);
-        Response::sendSuccess(
-            [
-                $attendeeWithId
-            ],
-            'Attendee retrieved successfully'
-        );
+        try {
+            $dto = new GetAttendeeDTO((int)$request->params[':id']);
+            $attendee = $this->attendeeService->getAttendeeById($dto->id);
+            Response::sendSuccess(
+                [$attendee->toArray()],
+                'Attendee retrieved successfully'
+            );
+        } catch (Throwable $e) {
+            ExceptionHandler::handle($e);
+        }
     }
 
     public function createAttendee(RequestItem $request): void
     {
-        $jsonMapper = new JsonMapper();
-        $dto = $jsonMapper->map($request->body, CreateAttendeeDTO::class);
-
-        if (Attendee::where('email', $dto->email)->exists()) {
-            Response::sendError('User already exists', 409);
-            return;
+        try {
+            $dto = $this->jsonMapper->map($request->body, CreateAttendeeDTO::class);
+            $result = $this->attendeeService->createAttendee($dto);
+            Response::sendSuccess(
+                $result,
+                'Attendee created successfully'
+            );
+        } catch (Throwable $e) {
+            ExceptionHandler::handle($e);
         }
-        $result = Attendee::create($dto->toArray());
-        Response::sendSuccess(
-            [
-                'sent' => $dto->toArray(),
-                'recieved' => $result,
-            ],
-            'Attendee created successfully'
-        );
     }
 
     public function updateAttendee(RequestItem $request): void
     {
-        $jsonMapper = new JsonMapper();
-        $dto = $jsonMapper->map($request->body, UpdateAttendeeDTO::class);
-
-        $resultFromDatabase = Attendee::find($dto['id'], 'id')->update($dto);
-        Response::sendSuccess(
-            [
-                'recieved' => $resultFromDatabase,
-            ],
-            'Attendee updated successfully'
-        );
+        try {
+            $dto = $this->jsonMapper->map($request->body, UpdateAttendeeDTO::class);
+            $result = $this->attendeeService->updateAttendee($dto);
+            Response::sendSuccess(
+                $result,
+                'Attendee updated successfully'
+            );
+        } catch (Throwable $e) {
+            ExceptionHandler::handle($e);
+        }
     }
 
     public function anonymiseAttendee(RequestItem $request): void
     {
-        $jsonMapper = new JsonMapper();
-        $dto = $jsonMapper->map($request->body, AnonymiseAttendeeDTO::class);
-
-        $attendeeId = $dto->getId();
-        $attendee = Attendee::find($attendeeId);
-
-        if (!$attendee) {
-            Response::sendError('Attendee not found', Response::HTTP_NOT_FOUND);
+        try {
+            $data = json_decode($request->body, true);
+            $attendeeId = (int)$data['id'];
+            $result = $this->attendeeService->anonymizeAttendee($attendeeId);
+            Response::sendSuccess(
+                $result,
+                'Attendee anonymised successfully'
+            );
+        } catch (Throwable $e) {
+            ExceptionHandler::handle($e);
         }
-
-        $beforeAnonymisation = [
-            'id' => $attendee->id,
-            'firstName' => $attendee->firstName,
-            'lastName' => $attendee->lastName,
-            'email' => $attendee->email,
-            'city' => $attendee->city,
-            'isActive' => $attendee->isActive,
-        ];
-
-
-        $anonymisedDTO = AnonymiseAttendeeDTO::fromAttendee($attendeeId)->toArray();
-        $attendee->update($anonymisedDTO);
-
-        Response::sendSuccess(
-            [
-                'sent' => $beforeAnonymisation,
-                'recieved' => $anonymisedDTO
-            ],
-            'Attendee anonymised successfully'
-        );
     }
 
     public function getAttendeeEvents(RequestItem $request): void
     {
-        $attendeeId = GetAttendeeDTO::getId($request);
-        $attendee = Attendee::with('events')->find($attendeeId);
-        $events = $attendee->events;
-        Response::sendSuccess($events->toArray(), 'Attendee events retrieved successfully');
+        try {
+            $attendeeId = (int)$request->params[':id'];
+            $events = $this->attendeeService->getAttendeeEvents($attendeeId);
+            Response::sendSuccess($events, 'Attendee events retrieved successfully');
+        } catch (Throwable $e) {
+            ExceptionHandler::handle($e);
+        }
     }
 
     public function registerForEvent(RequestItem $request): void
     {
-        $jsonMapper = new JsonMapper();
-        $dto = $jsonMapper->map($request->body, RegisterForEventDTO::class);
-
-        $attendeeId = $dto->getAttendeeId();
-        $eventId = $dto->getEventId();
-
-        $attendee = Attendee::find($attendeeId);
-        if (!$attendee) {
-            Response::sendError('Attendee not found', 404);
+        try {
+            $dto = $this->jsonMapper->map($request->body, RegisterForEventDTO::class);
+            $result = $this->attendeeService->registerForEvent($dto);
+            Response::sendSuccess($result, 'Successfully registered for event');
+        } catch (Throwable $e) {
+            ExceptionHandler::handle($e);
         }
-
-        $event = Event::find($eventId);
-        if (!$event) {
-            Response::sendError('Event not found', 404);
-        }
-
-        $exists = $attendee->activeEvents()->where('eventId', $eventId)->exists();
-        if ($exists) {
-            Response::sendError('Attendee already registered for event', 400);
-        }
-
-        $registrationDetails = $dto->withRegistered()->toDatabaseArray();
-
-        $attendee->events()->sync([
-            $eventId => $registrationDetails
-        ], false);
-
-        Response::sendSuccess([
-            'attendee_id' => $attendeeId,
-            'event_id' => $eventId
-        ], 'Successfully registered for event');
     }
 
     public function unregisterForEvent(RequestItem $request): void
     {
-        $unregistrationDTO = RegisterForEventDTO::create($request);
-        $attendeeId = $unregistrationDTO->getAttendeeId();
-        $eventId = $unregistrationDTO->getEventId();
-
-        $attendee = Attendee::find($attendeeId);
-        if (!$attendee) {
-            Response::sendError('Attendee not found', 404);
+        try {
+            $dto = $this->jsonMapper->map($request->body, RegisterForEventDTO::class);
+            $result = $this->attendeeService->unregisterFromEvent($dto);
+            Response::sendSuccess($result, 'Successfully unregistered from event');
+        } catch (Throwable $e) {
+            ExceptionHandler::handle($e);
         }
-
-        $event = Event::find($eventId);
-        if (!$event) {
-            Response::sendError('Event not found', 404);
-        }
-
-        $exists = $attendee->activeEvents()->where('eventId', $eventId)->exists();
-        if (!$exists) {
-            Response::sendError('Attendee is not registered for this event', 404);
-        }
-
-        $unregistrationDetails = $unregistrationDTO->withUnregistered()->toDatabaseArray();
-
-        $attendee->events()->sync([
-            $eventId => $unregistrationDetails
-        ], false);
-
-        Response::sendSuccess([
-            'attendee_id' => $attendeeId,
-            'event_id' => $eventId
-        ], 'Successfully unregistered from event');
     }
 }
