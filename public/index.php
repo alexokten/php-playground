@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../router.php';
-require_once __DIR__ . '/../database/connection.php';
-
 use App\Controllers\AttendeeController;
 
-ray()->clearAll();
-
 try {
+    require_once __DIR__ . '/../vendor/autoload.php';
+    require_once __DIR__ . '/../router.php';
+    require_once __DIR__ . '/../database/connection.php';
+
+
+    ray()->clearAll();
 
     $router = new Router();
     $router
