@@ -16,7 +16,7 @@ try {
     $router
         ->get('/api/attendee/all', [AttendeeController::class, 'getAllAttendees'])
         ->get('/api/attendee/get/:id', [AttendeeController::class, 'getAttendeeById'])
-        ->get('/api/attendee/events', [AttendeeController::class, 'getAttendeeEvents'])
+        ->get('/api/attendee/events/:id', [AttendeeController::class, 'getAttendeeEvents'])
         ->post('/api/attendee/create', [AttendeeController::class, 'createAttendee'])
         ->put('/api/attendee/update', [AttendeeController::class, 'updateAttendee'])
         ->put('/api/attendee/anonymise', [AttendeeController::class, 'anonymiseAttendee'])
