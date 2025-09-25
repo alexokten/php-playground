@@ -22,7 +22,6 @@ try {
         ->put('/api/attendee/anonymise', [AttendeeController::class, 'anonymiseAttendee'])
         ->post('/api/event/register', [AttendeeController::class, 'registerForEvent'])
         ->post('/api/event/unregister', [AttendeeController::class, 'unRegisterForEvent']);
-
     $router->dispatch();
 } catch (Exception $e) {
     if ($_ENV['APP_ENV'] === 'development') {

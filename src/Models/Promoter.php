@@ -29,6 +29,7 @@ class Promoter extends Model
 
     public function events()
     {
+        // TODO: hasMany()?
         return $this->belongsToMany(
             Event::class,
             'event_promoters',

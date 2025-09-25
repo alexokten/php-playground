@@ -12,6 +12,7 @@ use App\DTOs\RegisterForEventDTO;
 use App\Helpers\Response;
 use App\Models\Attendee;
 use App\Models\Event;
+use Brick\JsonMapper\JsonMapper;
 use Illuminate\Support\Carbon;
 use RequestItem;
 
@@ -45,7 +46,8 @@ class AttendeeController
 
     public function createAttendee(RequestItem $request): void
     {
-        $dto = CreateAttendeeDTO::create($request);
+        $jsonMapper = new JsonMapper();
+        $dto = $jsonMapper->map($request->body, CreateAttendeeDTO::class);
 
         if (Attendee::where('email', $dto->email)->exists()) {
             Response::sendError('User already exists', 409);
@@ -63,11 +65,13 @@ class AttendeeController
 
     public function updateAttendee(RequestItem $request): void
     {
-        $dto = UpdateAttendeeDTO::create($request)->toArray();
-        $result = Attendee::find($dto['id'], 'id')->update($dto);
+        $jsonMapper = new JsonMapper();
+        $dto = $jsonMapper->map($request->body, UpdateAttendeeDTO::class);
+
+        $resultFromDatabase = Attendee::find($dto['id'], 'id')->update($dto);
         Response::sendSuccess(
             [
-                'recieved' => $result,
+                'recieved' => $resultFromDatabase,
             ],
             'Attendee updated successfully'
         );
@@ -75,7 +79,10 @@ class AttendeeController
 
     public function anonymiseAttendee(RequestItem $request): void
     {
-        $attendeeId = AnonymiseAttendeeDTO::create($request)->getId();
+        $jsonMapper = new JsonMapper();
+        $dto = $jsonMapper->map($request->body, AnonymiseAttendeeDTO::class);
+
+        $attendeeId = $dto->getId();
         $attendee = Attendee::find($attendeeId);
 
         if (!$attendee) {
@@ -114,9 +121,11 @@ class AttendeeController
 
     public function registerForEvent(RequestItem $request): void
     {
-        $registrationDTO = RegisterForEventDTO::create($request);
-        $attendeeId = $registrationDTO->getAttendeeId();
-        $eventId = $registrationDTO->getEventId();
+        $jsonMapper = new JsonMapper();
+        $dto = $jsonMapper->map($request->body, RegisterForEventDTO::class);
+
+        $attendeeId = $dto->getAttendeeId();
+        $eventId = $dto->getEventId();
 
         $attendee = Attendee::find($attendeeId);
         if (!$attendee) {
@@ -133,7 +142,7 @@ class AttendeeController
             Response::sendError('Attendee already registered for event', 400);
         }
 
-        $registrationDetails = $registrationDTO->withRegistered()->toDatabaseArray();
+        $registrationDetails = $dto->withRegistered()->toDatabaseArray();
 
         $attendee->events()->sync([
             $eventId => $registrationDetails

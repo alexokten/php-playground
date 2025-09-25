@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\DTOs;
 
 use Illuminate\Support\Carbon;
-use RequestItem;
 
 class CreateAttendeeDTO
 {
@@ -18,6 +17,7 @@ class CreateAttendeeDTO
         public readonly bool $isActive = true
     ) {}
 
+    /** INFO: Replaced by JSONMapper
     public static function create(RequestItem $request)
     {
         $data = json_decode($request->body, true);
@@ -29,7 +29,7 @@ class CreateAttendeeDTO
             city: $data['city'],
             isActive: $data['isActive'],
         );
-    }
+    } */
 
     public function toArray(): array
     {
