@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/utils/SqlHighlighter.php';
+require_once __DIR__ . '/utils/ExplainAnalyzer.php';
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Events\Dispatcher;
@@ -46,13 +48,11 @@ $capsule->bootEloquent();
 if (class_exists('Spatie\Ray\Ray')) {
     // Track EXPLAIN ANALYZE queries to avoid logging them
     $isExplainQuery = false;
-
     $capsule->getConnection()->listen(function ($query) use (&$isExplainQuery) {
         // Skip if this is an EXPLAIN ANALYZE query we triggered
         if (stripos(trim($query->sql), 'EXPLAIN ANALYZE') === 0) {
             return;
         }
-
         $fullQuery = $query->sql;
         foreach ($query->bindings as $binding) {
             if ($binding === null) {
@@ -67,6 +67,7 @@ if (class_exists('Spatie\Ray\Ray')) {
             $fullQuery = preg_replace('/\?/', $value, $fullQuery, 1);
         }
 
+        // Format SQL with proper line breaks
         $formattedQuery = preg_replace([
             '/\bSELECT\b/i',
             '/\bFROM\b/i',
@@ -89,19 +90,14 @@ if (class_exists('Spatie\Ray\Ray')) {
             "\nLIMIT",
         ], $fullQuery);
 
-        ray()
-            ->html('<pre style="font-size: 10px; line-height: 1.4; background: #212936; color: #76DB88; padding: 8px; border-radius: 2px;">' . htmlspecialchars($formattedQuery) . '</pre>')
-            ->label('SQL Query (' . $query->time . 'ms)')
-            ->orange();
+        // Apply clean SQL syntax highlighting
+        $highlightedQuery = highlightSQLClean($formattedQuery);
 
-        // Only run EXPLAIN ANALYZE for SELECT queries
+        // Only run EXPLAIN ANALYZE for SELECT queries to get concrete performance data
         if (stripos(trim($query->sql), 'SELECT') === 0) {
             try {
-                // Set flag to prevent logging the EXPLAIN query
                 $isExplainQuery = true;
-
                 $explainResults = $query->connection->select("EXPLAIN ANALYZE " . $query->sql, $query->bindings);
-
                 $parsedExplain = [];
                 $stepNumber = 1;
 
@@ -117,104 +113,58 @@ if (class_exists('Spatie\Ray\Ray')) {
                 }
 
                 if (!empty($parsedExplain)) {
+                    // Get concrete performance from EXPLAIN ANALYZE results
+                    $explainDuration = getOverallPerformanceFromExplain($parsedExplain);
+                    $performanceColor = getPerformanceColor($explainDuration);
+
+                    // Display SQL query with EXPLAIN ANALYZE-based performance color
+                    ray()
+                        ->html($highlightedQuery)
+                        ->label('SQL Query (' . round($explainDuration * 1000, 2) . 'ms from EXPLAIN)')
+                        ->{$performanceColor}();
+
                     ray($parsedExplain)
                         ->label('SQL Performance')
-                        ->red()
+                        ->{$performanceColor}()
                         ->expand();
+                } else {
+                    // Fallback to Laravel query time if no EXPLAIN data
+                    $queryDuration = $query->time / 1000;
+                    $performanceColor = getPerformanceColor($queryDuration);
+                    
+                    ray()
+                        ->html($highlightedQuery)
+                        ->label('SQL Query (' . $query->time . 'ms)')
+                        ->{$performanceColor}();
                 }
 
-                // Reset flag
                 $isExplainQuery = false;
             } catch (\Exception $e) {
-                $isExplainQuery = false; // Reset flag on error too
+                $isExplainQuery = false;
+                
+                // Fallback to Laravel query time if EXPLAIN ANALYZE fails
+                $queryDuration = $query->time / 1000;
+                $performanceColor = getPerformanceColor($queryDuration);
+                
+                ray()
+                    ->html($highlightedQuery)
+                    ->label('SQL Query (' . $query->time . 'ms)')
+                    ->{$performanceColor}();
+
                 ray()
                     ->label('Explain Analyze Error')
                     ->yellow()
                     ->text('Could not execute EXPLAIN ANALYZE: ' . $e->getMessage());
             }
+        } else {
+            // For non-SELECT queries, use Laravel query time
+            $queryDuration = $query->time / 1000;
+            $performanceColor = getPerformanceColor($queryDuration);
+            
+            ray()
+                ->html($highlightedQuery)
+                ->label('SQL Query (' . $query->time . 'ms)')
+                ->{$performanceColor}();
         }
     });
-}
-
-function parseExplainLine($line, $stepNumber)
-{
-    // Remove leading/trailing whitespace and arrows
-    $line = trim($line, "-> \t\n\r\0\x0B");
-
-    if (empty($line)) {
-        return null;
-    }
-
-    $parsed = [
-        'operation' => '',
-        'cost_estimate' => null,
-        'estimated_rows' => null,
-        'actual_time' => null,
-        'actual_rows' => null,
-        'loops' => null,
-        'details' => '',
-        'raw_line' => $line
-    ];
-
-    // Extract operation name (everything before the first parenthesis)
-    if (preg_match('/^([^(]+)/', $line, $matches)) {
-        $parsed['operation'] = trim($matches[1]);
-    }
-
-    // Extract cost estimate
-    if (preg_match('/cost=([0-9.]+)/', $line, $matches)) {
-        $parsed['cost_estimate'] = (float)$matches[1];
-    }
-
-    // Extract estimated rows
-    if (preg_match('/rows=([0-9]+)/', $line, $matches)) {
-        $parsed['estimated_rows'] = (int)$matches[1];
-    }
-
-    // Extract actual time
-    if (preg_match('/actual time=([0-9.]+)\.\.([0-9.]+)/', $line, $matches)) {
-        $parsed['actual_time'] = [
-            'start' => (float)$matches[1],
-            'end' => (float)$matches[2],
-            'duration' => (float)$matches[2] - (float)$matches[1]
-        ];
-    }
-
-    // Extract actual rows
-    if (preg_match('/actual.*rows=([0-9]+)/', $line, $matches)) {
-        $parsed['actual_rows'] = (int)$matches[1];
-    }
-
-    // Extract loops
-    if (preg_match('/loops=([0-9]+)/', $line, $matches)) {
-        $parsed['loops'] = (int)$matches[1];
-    }
-
-    // Extract details (table names, conditions, etc.)
-    if (preg_match('/on (\w+)/', $line, $matches)) {
-        $parsed['table'] = $matches[1];
-    }
-
-    if (preg_match('/using (\w+)/', $line, $matches)) {
-        $parsed['index'] = $matches[1];
-    }
-
-    // Calculate efficiency metrics
-    if ($parsed['estimated_rows'] && $parsed['actual_rows']) {
-        $parsed['row_estimate_accuracy'] = round(($parsed['actual_rows'] / $parsed['estimated_rows']) * 100, 1) . '%';
-    }
-
-    if (isset($parsed['actual_time']['duration'])) {
-        $parsed['performance_rating'] = getPerformanceRating($parsed['actual_time']['duration']);
-    }
-
-    return $parsed;
-}
-
-function getPerformanceRating($duration)
-{
-    if ($duration < 0.001) return 'Excellent';
-    if ($duration < 0.01) return 'Good';
-    if ($duration < 0.1) return 'Fair';
-    return 'Slow';
 }
