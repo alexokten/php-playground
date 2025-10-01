@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Enums\QueueStatus;
 
 class Queue extends Model
 {
@@ -20,6 +21,7 @@ class Queue extends Model
         return [
             'queue' => 'string',
             'payload' => 'string',
+            'status' => QueueStatus::class,
             'attempts' => 'integer',
             'reservedAt' => 'datetime',
             'availableAt' => 'datetime',

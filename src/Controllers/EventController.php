@@ -21,7 +21,7 @@ class EventController
 
     public function __construct()
     {
-        $this->eventService = new EventService(new EventRepository);
+        $this->eventService = new EventService();
         $this->jsonMapper = new JsonMapper();
     }
 

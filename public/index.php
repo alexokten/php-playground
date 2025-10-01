@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Controllers\AttendeeController;
 use App\Controllers\EventController;
+use App\Controllers\QueueController;
 
 try {
     require_once __DIR__ . '/../vendor/autoload.php';
@@ -25,7 +26,9 @@ try {
         ->post('/api/event/unregister', [AttendeeController::class, 'unRegisterForEvent'])
 
         ->get('/api/event/all', [EventController::class, 'getAllEvents'])
-        ->get('/api/event/sales/percentage/:id', [EventController::class, 'getEventTicketSalesAsPercentage']);
+        ->get('/api/event/sales/percentage/:id', [EventController::class, 'getEventTicketSalesAsPercentage'])
+
+        ->post('/api/queue/test-email', [QueueController::class, 'SendTestEmail']);
 
 
     $router->dispatch();

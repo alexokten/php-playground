@@ -26,7 +26,7 @@ class AttendeeController
 
     public function __construct()
     {
-        $this->attendeeService = new AttendeeService(new AttendeeRepository());
+        $this->attendeeService = new AttendeeService();
         $this->jsonMapper = new JsonMapper();
     }
 
