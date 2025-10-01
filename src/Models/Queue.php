@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Queue extends Model
 {
-    protected $table = 'attendees';
+    protected $table = 'queue';
 
     const CREATED_AT = 'createdAt';
     const UPDATED_AT = 'updatedAt';
