@@ -19,7 +19,7 @@ class ErrorDTO
     public static function create(array $data, string $message, int $statusCode): self
     {
         return new self(
-            success: true,
+            success: false,
             message: $message,
             data: $data,
             statusCode: $statusCode ?? 500,

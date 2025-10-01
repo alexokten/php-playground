@@ -16,7 +16,7 @@ class EventRepository
         return Event::all();
     }
 
-    public function findById(int $id): Collection
+    public function findById(int $id): Event | null
     {
         return Event::find($id);
     }
@@ -85,5 +85,14 @@ class EventRepository
             ->wherePivotNull('unregisteredAt')
             ->count();
         return $registeredCount < $event->maxTickets;
+    }
+
+    public function countSoldTickets(Event $event): int
+    {
+        $soldCount = $event
+            ->attendees()
+            ->wherePivotNull('unregisteredAt')
+            ->count();
+        return $soldCount;
     }
 }

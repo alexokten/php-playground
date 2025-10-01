@@ -1,0 +1,15 @@
+meta {
+  name: getEventTicketSalesAsPercentage
+  type: http
+  seq: 9
+}
+
+get {
+  url: http://localhost:8080/api/event/sales/percentage/233
+  body: json
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

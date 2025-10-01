@@ -17,9 +17,12 @@ use RuntimeException;
 
 class AttendeeService
 {
-    public function __construct(
-        private readonly AttendeeRepository $attendeeRepository
-    ) {}
+    private readonly AttendeeRepository $attendeeRepository;
+
+    public function __construct()
+    {
+        $this->attendeeRepository = new AttendeeRepository();
+    }
 
     public function getAllAttendees(): Collection
     {

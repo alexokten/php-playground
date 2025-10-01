@@ -21,8 +21,8 @@ header('Cache-Control: no-cache, must-revalidate');
 
 class AttendeeController
 {
-    private readonly AttendeeService $attendeeService;
     private readonly JsonMapper $jsonMapper;
+    private readonly AttendeeService $attendeeService;
 
     public function __construct()
     {
@@ -59,7 +59,6 @@ class AttendeeController
 
     public function createAttendee(RequestItem $request): void
     {
-        ray('hey');
         try {
             $dto = $this->jsonMapper->map($request->body, CreateAttendeeDTO::class);
             $result = $this->attendeeService->createAttendee($dto);

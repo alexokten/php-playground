@@ -53,4 +53,18 @@ class Event extends Model
     {
         return $query->where('eventDate', '>', Carbon::now());
     }
+
+    public function scopeWhereIsInPast(Builder $query): Builder
+    {
+        return $query->where('eventDate', '<', Carbon::now());
+    }
+
+    public function scopeWhereIsSoldOut(Builder $query): Builder
+    {
+        return $query->withCount(
+            ['attendees' => function ($q) {
+                $q->whereNull('unregisteredAt');
+            }]
+        )->havingRaw('attendees_count >= maxTickets');
+    }
 }

@@ -14,6 +14,7 @@ class ExceptionHandler
 {
     public static function handle(Throwable $e): void
     {
+        ray($e); // dev only
         switch (true) {
             case $e instanceof JsonMapperException:
                 Response::sendError($e->getMessage(), 400);

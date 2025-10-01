@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Controllers\AttendeeController;
+use App\Controllers\EventController;
 
 try {
     require_once __DIR__ . '/../vendor/autoload.php';
@@ -21,11 +22,17 @@ try {
         ->put('/api/attendee/update', [AttendeeController::class, 'updateAttendee'])
         ->put('/api/attendee/anonymise', [AttendeeController::class, 'anonymiseAttendee'])
         ->post('/api/event/register', [AttendeeController::class, 'registerForEvent'])
-        ->post('/api/event/unregister', [AttendeeController::class, 'unRegisterForEvent']);
+        ->post('/api/event/unregister', [AttendeeController::class, 'unRegisterForEvent'])
+
+        ->get('/api/event/all', [EventController::class, 'getAllEvents'])
+        ->get('/api/event/sales/percentage/:id', [EventController::class, 'getEventTicketSalesAsPercentage']);
+
+
     $router->dispatch();
 } catch (Exception $e) {
     if ($_ENV['APP_ENV'] === 'development') {
         echo $e;
         ray($e);
+        //sentry()
     }
 }
