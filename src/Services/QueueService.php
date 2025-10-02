@@ -76,6 +76,44 @@ class QueueService
         }
     }
 
+    public function processBatch(string $queueName = 'default', int $batchSize = 10): int
+    {
+        $jobs = $this->queueRepository->popBatch($queueName, $batchSize);
+
+        if ($jobs->isEmpty()) {
+            return 0;
+        }
+
+        $processedCount = 0;
+
+        foreach ($jobs as $job) {
+            try {
+                $payload = json_decode($job->payload, true);
+                $jobClass = $payload['class'];
+                $jobData = $payload['data'];
+
+                $jobInstance = new $jobClass(...array_values($jobData));
+                $jobInstance->handle();
+
+                $this->queueRepository->markAsComplete($job);
+
+                ray("Job {$job->id} completed");
+                $processedCount++;
+            } catch (Throwable $e) {
+                if ($job->attempts < 3) {
+                    $delay = pow(2, $job->attempts) * 60;
+                    $this->queueRepository->release($job, delay: $delay);
+                    ray("Job {$job->id} will retry in {$delay}s")->yellow();
+                } else {
+                    $this->queueRepository->markAsFailed($job);
+                    ray("Job {$job->id} permanently failed")->red();
+                }
+            }
+        }
+
+        return $processedCount; // Return number of successfully processed jobs
+    }
+
     public function getPendingCount(string $queueName = 'default'): int
     {
         return $this->queueRepository->getAllPendingJobsCount($queueName);

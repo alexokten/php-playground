@@ -31,10 +31,9 @@ class QueueRepository
         return DB::transaction(function () use ($queueName) {
             $queueJob = Queue::where('queue', $queueName)
                 ->where('status', QueueStatus::PENDING) // <- Status is pending
-                ->whereNull('reservedAt') // <- not reservered
                 ->where('availableAt', '<=', Carbon::now()) // <- available to work on now
                 ->orderBy('availableAt', 'asc') // <- sort by oldest first
-                ->lockForUpdate() // <- lock row so it cannot be worked on elsewhere 
+                ->lockForUpdate() // <- lock row so it cannot be worked on elsewhere
                 ->first(); // <- return first item
 
             if ($queueJob) {
@@ -44,6 +43,29 @@ class QueueRepository
                 $queueJob->save(); // <- save
             }
             return $queueJob; // <- return the job
+        });
+    }
+
+    public function popBatch(string $queueName = 'default', int $batchSize = 10): Collection
+    {
+        return DB::transaction(function () use ($queueName, $batchSize) {
+            $jobs = Queue::where('queue', $queueName)
+                ->where('status', QueueStatus::PENDING) // <- Status is pending
+                ->where('availableAt', '<=', Carbon::now()) // <- available to work on now
+                ->orderBy('availableAt', 'asc') // <- sort by oldest first
+                ->lockForUpdate() // <- lock row so it cannot be worked on elsewhere
+                ->limit($batchSize) // <- return x number
+                ->get();
+
+            if ($jobs->isNotEmpty()) {
+                foreach ($jobs as $job) {
+                    $job->status = QueueStatus::PROCESSING; // <- update to processing
+                    $job->reservedAt = Carbon::now(); // <- mark as reservered (ontop of locking)
+                    $job->attempts++; // <- update attempts +1
+                    $job->save(); // <- save
+                }
+            }
+            return $jobs; // <- return the jobs
         });
     }
 
