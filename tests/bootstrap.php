@@ -8,7 +8,8 @@ if (file_exists(__DIR__ . '/../.env')) {
     $dotenv->load();
 }
 
-$testHost = $_ENV['DB_HOST_TEST'] ?? 'db_test';
+// Default to 127.0.0.1 for CI, or db_test for local Docker
+$testHost = $_ENV['DB_HOST_TEST'] ?? (getenv('CI') ? '127.0.0.1' : 'db_test');
 $testDatabase = $_ENV['DB_DATABASE_TEST'] ?? 'headfirst_db_test';
 $testUsername = $_ENV['DB_USERNAME_TEST'] ?? 'headfirst_user_test';
 $testPassword = $_ENV['DB_PASSWORD_TEST'] ?? 'password_test';
