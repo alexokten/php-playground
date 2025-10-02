@@ -11,7 +11,6 @@ use App\Services\QueueService;
 // Configuration
 $queueName = 'email';  // Allow queue name as argument
 $sleepDuration = 2;
-$processedCount = 0;
 
 echo "Queue worker started\n";
 echo "Queue: {$queueName}\n";
@@ -21,11 +20,10 @@ $queueService = new QueueService();
 
 while (true) {
     try {
-        $processed = $queueService->processNext($queueName);
+        $processed = $queueService->processBatch($queueName);
 
         if ($processed) {
-            $processedCount++;
-            echo "Job completed (Total: {$processedCount})\n";
+            echo "Job completed (Total: {$processed})\n";
         } else {
             echo "No jobs, sleeping {$sleepDuration}s...\n";
             sleep($sleepDuration);
