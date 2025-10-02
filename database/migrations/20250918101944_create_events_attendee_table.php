@@ -27,8 +27,8 @@ final class CreateEventsAttendeeTable extends AbstractMigration
         }
 
         $table
-            ->addColumn('attendee_id', 'integer', ['null' => false])
-            ->addColumn('event_id', 'integer', ['null' => false])
+            ->addColumn('attendee_id', 'integer', ['null' => false, 'signed' => false])
+            ->addColumn('event_id', 'integer', ['null' => false, 'signed' => false])
             ->addColumn('registered_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
             ->addColumn('attended_at', 'timestamp', ['null' => true])
             ->addIndex(['attendee_id', 'event_id'], ['unique' => true])

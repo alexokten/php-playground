@@ -57,18 +57,4 @@ final class AddEmailQueue extends AbstractMigration
             ->addTimestamps('createdAt', 'updatedAt')
             ->create();
     }
-    public function up(): void
-    {
-        $exists = $this->hasTable('queue');
-        if ($exists) {
-            $this->table('queue')->drop()->save();
-        }
-
-        $table = $this->table('queue');
-    }
-
-    public function down(): void
-    {
-        $this->table('queue')->drop()->save();
-    }
 }

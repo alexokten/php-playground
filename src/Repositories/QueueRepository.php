@@ -30,20 +30,20 @@ class QueueRepository
     {
         return DB::transaction(function () use ($queueName) {
             $queueJob = Queue::where('queue', $queueName)
-                ->where('status', QueueStatus::PENDING)
-                ->whereNull('reservedAt')
-                ->where('availableAt', '<=', Carbon::now())
-                ->orderBy('availableAt', 'asc')
-                ->lockForUpdate()
-                ->first();
+                ->where('status', QueueStatus::PENDING) // <- Status is pending
+                ->whereNull('reservedAt') // <- not reservered
+                ->where('availableAt', '<=', Carbon::now()) // <- available to work on now
+                ->orderBy('availableAt', 'asc') // <- sort by oldest first
+                ->lockForUpdate() // <- lock row so it cannot be worked on elsewhere 
+                ->first(); // <- return first item
 
             if ($queueJob) {
-                $queueJob->status = QueueStatus::PROCESSING;
-                $queueJob->reservedAt = Carbon::now();
-                $queueJob->attempts++;
-                $queueJob->save();
+                $queueJob->status = QueueStatus::PROCESSING; // <- update to processing
+                $queueJob->reservedAt = Carbon::now(); // <- mark as reservered (ontop of locking)
+                $queueJob->attempts++; // <- update attempts +1
+                $queueJob->save(); // <- save
             }
-            return $queueJob;
+            return $queueJob; // <- return the job
         });
     }
 
@@ -61,7 +61,7 @@ class QueueRepository
         $job->save();
     }
 
-    public function release(Queue $job, int $delay = 0): void
+    public function release(Queue $job, int $delay = 0): void // <- row lock is transactional, so not required here
     {
         $job->status = QueueStatus::PENDING;
         $job->reservedAt = null;
@@ -90,5 +90,13 @@ class QueueRepository
         return Queue::where('queue', $queueName)
             ->where('status', QueueStatus::PENDING)
             ->count();
+    }
+
+    public function getLastCompletedJob(string $queueName = 'default'): Queue
+    {
+        return Queue::where('queue', $queueName)
+            ->where('status', QueueStatus::COMPLETED)
+            ->orderBy('completedAt', 'asc')
+            ->first();
     }
 }

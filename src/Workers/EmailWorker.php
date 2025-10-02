@@ -11,6 +11,7 @@ echo "Worker started!\n";
 
 $queueService = new QueueService();
 $queueName = 'email';
+const DURATION = 5;
 
 while (true) {
     try {
@@ -20,10 +21,11 @@ while (true) {
             echo "Job completed!\n";
         } else {
             echo "No jobs, sleeping...\n";
-            sleep(3);
+            // XXX: Set the delay here
+            sleep(DURATION);
         }
     } catch (Throwable $e) {
-        echo "x Error: {$e->getMessage()}\n";
-        sleep(3);
+        echo "Error: {$e->getMessage()}\n";
+        sleep(DURATION);
     }
 }

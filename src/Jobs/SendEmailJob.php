@@ -15,6 +15,7 @@ class SendEmailJob
     public function handle(): void
     {
         // INFO: Mock sending an email
+        // INFO: Email logic goes here
         ray()->html("
               <strong>Sending Email</strong><br>
               <strong>To:</strong> {$this->to}<br>
@@ -22,6 +23,6 @@ class SendEmailJob
               <strong>Body:</strong> {$this->body}
           ");
         sleep(1);
-        ray('Email sent to {$this->to}')->green();
+        ray("Email sent to {$this->to}")->green();
     }
 }

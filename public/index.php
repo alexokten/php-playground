@@ -28,7 +28,7 @@ try {
         ->get('/api/event/all', [EventController::class, 'getAllEvents'])
         ->get('/api/event/sales/percentage/:id', [EventController::class, 'getEventTicketSalesAsPercentage'])
 
-        ->post('/api/queue/test-email', [QueueController::class, 'SendTestEmail']);
+        ->post('/api/queue/test-email/:delay', [QueueController::class, 'sendTestEmail']);
 
 
     $router->dispatch();
