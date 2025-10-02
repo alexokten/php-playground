@@ -7,7 +7,6 @@ namespace App\Services;
 use App\Models\Queue;
 use App\Repositories\QueueRepository;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
 use Throwable;
 
 class QueueService
@@ -31,13 +30,13 @@ class QueueService
 
         $availableAt = Carbon::now()->addSeconds($delaySeconds); // <- set time to now and add delay
 
+        ray('Job dispatched to database');
+
         return $this->queueRepository->push(
             queue: $queueName,
             payload: $payloadJSON,
             availableAt: $availableAt,
         );
-
-        ray('Job dispatched to database');
     }
 
     // Process next available job in queue

@@ -16,19 +16,19 @@ class QueueRepository
         string $queue,
         string $payload,
         Carbon $availableAt
-    ) {
+    ): Queue {
         return Queue::create([
             'queue' => $queue,
             'payload' => $payload,
             'status' => QueueStatus::PENDING,
             'attempts' => 0,
-            'availableAt' => $availableAt ?? Carbon::now(),
+            'availableAt' => $availableAt,
         ]);
     }
 
     public function pop(string $queueName = 'default'): Queue | null
     {
-        return DB::transaction(function () use ($queueName) {
+        return DB::transaction(function () use ($queueName): ?Queue {
             $queueJob = Queue::where('queue', $queueName)
                 ->where('status', QueueStatus::PENDING) // <- Status is pending
                 ->where('availableAt', '<=', Carbon::now()) // <- available to work on now
@@ -48,7 +48,7 @@ class QueueRepository
 
     public function popBatch(string $queueName = 'default', int $batchSize = 10): Collection
     {
-        return DB::transaction(function () use ($queueName, $batchSize) {
+        return DB::transaction(function () use ($queueName, $batchSize): Collection {
             $jobs = Queue::where('queue', $queueName)
                 ->where('status', QueueStatus::PENDING) // <- Status is pending
                 ->where('availableAt', '<=', Carbon::now()) // <- available to work on now

@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
+namespace Router;
+
 use Spatie\Regex\Regex;
 
 class RouterUtils
 {
-    public const PARAMETER_MATCH_PATTERN = '/\:\w+/';
+    public const string PARAMETER_MATCH_PATTERN = '/\:\w+/';
 
-    public static function matchParamPattern(string $routeSegment)
+    public static function matchParamPattern(string $routeSegment): bool
     {
         return Regex::match(self::PARAMETER_MATCH_PATTERN, $routeSegment)->hasMatch();
     }
@@ -18,7 +20,7 @@ class RouteItem
 {
     public string $method;
     public string $slug;
-    public $callback;
+    public array | callable $callback;
     public ?string $controllerClass = null;
     public ?string $controllerMethod = null;
 
@@ -37,22 +39,22 @@ class RouteItem
         }
     }
 
-    public static function get(string $slug, array | callable $callback)
+    public static function get(string $slug, array | callable $callback): self
     {
         return new self('GET', $slug, $callback);
     }
 
-    public static function post(string $slug, array | callable $callback)
+    public static function post(string $slug, array | callable $callback): self
     {
         return new self('POST', $slug, $callback);
     }
 
-    public static function put(string $slug, array | callable $callback)
+    public static function put(string $slug, array | callable $callback): self
     {
         return new self('PUT', $slug, $callback);
     }
 
-    public static function delete(string $slug, array | callable $callback)
+    public static function delete(string $slug, array | callable $callback): self
     {
         return new self('DELETE', $slug, $callback);
     }
@@ -78,7 +80,7 @@ class ResponseItem
 {
     public static function sendResponse(
         string $responseJson
-    ) {
+    ): void {
         ray($responseJson);
         echo $responseJson;
     }
@@ -86,7 +88,7 @@ class ResponseItem
 
 class Router
 {
-    private $registeredRoutes = [];
+    private array $registeredRoutes = [];
 
     public function dispatch(): void
     {
@@ -95,7 +97,7 @@ class Router
 
         $request->params = $this->extractUrlParameters($route->slug, $request->url);
 
-        $controller = new $route->controllerClass();
+        $controller = $route->controllerClass();
         $controller->{$route->controllerMethod}($request);
     }
 

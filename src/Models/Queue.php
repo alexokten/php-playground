@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Enums\QueueStatus;
+use Carbon\Carbon;
 
 class Queue extends Model
 {
