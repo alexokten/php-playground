@@ -11,13 +11,15 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
 use Dotenv\Dotenv;
 
-/** 1 - Load environment variables (prefer local if exists) */
-$dotenv = Dotenv::createImmutable(__DIR__ . '/..');
+/** 1 - Load environment variables (prefer local if exists, skip in CI) */
 if (file_exists(__DIR__ . '/../.env.local')) {
+    $dotenv = Dotenv::createImmutable(__DIR__ . '/..');
     $dotenv->load('.env.local');
-} else {
+} elseif (file_exists(__DIR__ . '/../.env')) {
+    $dotenv = Dotenv::createImmutable(__DIR__ . '/..');
     $dotenv->load();
 }
+// If no .env files exist (CI environment), use environment variables directly
 
 /** 2 - Create Capsule instance */
 $capsule = new Capsule;
@@ -25,10 +27,10 @@ $capsule = new Capsule;
 /** 3 - Add database connection */
 $capsule->addConnection([
     'driver' => 'mysql',
-    'host' => $_ENV['DB_HOST'],
-    'database' => $_ENV['DB_DATABASE'],
-    'username' => $_ENV['DB_USERNAME'],
-    'password' => $_ENV['DB_PASSWORD'],
+    'host' => $_ENV['DB_HOST'] ?? '127.0.0.1',
+    'database' => $_ENV['DB_DATABASE'] ?? 'headfirst_db',
+    'username' => $_ENV['DB_USERNAME'] ?? 'root',
+    'password' => $_ENV['DB_PASSWORD'] ?? '',
     'port' => $_ENV['DB_PORT'] ?? 3306,
     'charset' => $_ENV['DB_CHARSET'] ?? 'utf8mb4',
     'collation' => $_ENV['DB_COLLATION'] ?? 'utf8mb4_unicode_ci',
