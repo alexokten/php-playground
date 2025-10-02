@@ -9,11 +9,22 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
+    // Use an array so the reference is shared across all child classes
+    private static array $state = ['migrationsRun' => false];
+
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+        if (!self::$state['migrationsRun']) {
+            self::runMigrations();
+            self::$state['migrationsRun'] = true;
+        }
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
         DB::connection()->beginTransaction();
-        $this->runMigrations();
     }
 
     protected function tearDown(): void
@@ -22,10 +33,9 @@ abstract class TestCase extends BaseTestCase
         parent::tearDown();
     }
 
-    protected function runMigrations(): void
+    protected static function runMigrations(): void
     {
         $output = shell_exec('cd ' . __DIR__ . '/.. && vendor/bin/phinx migrate -e testing 2>&1');
-
         if ($output && strpos($output, 'All Done') === false && strpos($output, 'already migrated') === false) {
             throw new \RuntimeException("Migration failed: {$output}");
         }
