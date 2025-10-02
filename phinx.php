@@ -4,13 +4,16 @@ require_once 'vendor/autoload.php';
 
 use Dotenv\Dotenv;
 
-$dotenv = Dotenv::createImmutable(__DIR__);
+// Load .env if it exists (for local dev), skip in CI where env vars are set directly
 if (file_exists(__DIR__ . '/.env.local')) {
+    $dotenv = Dotenv::createImmutable(__DIR__);
     $dotenv->load('.env.local');
     ray($dotenv);
-} else {
+} elseif (file_exists(__DIR__ . '/.env')) {
+    $dotenv = Dotenv::createImmutable(__DIR__);
     $dotenv->load();
 }
+// If no .env files exist (CI environment), use environment variables directly
 
 return [
     'paths' => [
