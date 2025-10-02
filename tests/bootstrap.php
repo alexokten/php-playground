@@ -2,8 +2,11 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
-$dotenv->load();
+// Load .env if it exists (for local dev), skip in CI
+if (file_exists(__DIR__ . '/../.env')) {
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+    $dotenv->load();
+}
 
 $testHost = $_ENV['DB_HOST_TEST'] ?? 'db_test';
 $testDatabase = $_ENV['DB_DATABASE_TEST'] ?? 'headfirst_db_test';
