@@ -15,6 +15,7 @@ class Attendee extends Model
 
     protected $guarded = ['id', 'createdAt', 'updatedAt'];
 
+    #[\Override]
     protected function casts()
     {
         return [
