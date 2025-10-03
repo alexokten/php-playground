@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Router;
 
+use Exception;
 use Spatie\Regex\Regex;
 
 class RouterUtils
@@ -97,8 +98,16 @@ class Router
 
         $request->params = $this->extractUrlParameters($route->slug, $request->url);
 
-        $controller = $route->controllerClass();
-        $controller->{$route->controllerMethod}($request);
+        if ($route->isControllerFunction()) {
+            $controllerClass = $route->controllerClass;
+            assert($controllerClass !== null && class_exists($controllerClass));
+            $controller = new $controllerClass();
+            $controllerMethod = $route->controllerMethod;
+            assert($controllerMethod !== null);
+            $controller->$controllerMethod($request);
+        } else {
+            ($route->callback)($request);
+        }
     }
 
     private function registerRoute(RouteItem $routeDefinition): void
@@ -215,11 +224,12 @@ class RequestFactory
 {
     public static function createFromGlobals(): RequestItem
     {
+        $body = file_get_contents('php://input');
         return new RequestItem(
-            method: $_SERVER['REQUEST_METHOD'],
-            url: $_SERVER['REQUEST_URI'],
-            headers: getallheaders(),
-            body: file_get_contents('php://input')
+            method: $_SERVER['REQUEST_METHOD'] ?? 'GET',
+            url: $_SERVER['REQUEST_URI'] ?? '/',
+            headers: getallheaders() ?: [],
+            body: $body !== false ? $body : '',
         );
     }
 }

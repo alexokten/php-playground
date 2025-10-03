@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\DTOs\Event\GetSoldTicketsPercentageDTO;
-use App\Repositories\EventRepository;
 use App\Services\EventService;
 use Brick\JsonMapper\JsonMapper;
 use App\Helpers\ExceptionHandler;
 use App\Helpers\Response;
-use RequestItem;
 use ResponseItem;
+use Router\RequestItem;
 use Throwable;
 
 class EventController
@@ -38,7 +37,7 @@ class EventController
         }
     }
 
-    public function getEventTicketSalesAsPercentage(RequestItem $request)
+    public function getEventTicketSalesAsPercentage(RequestItem $request): void
     {
         try {
             $eventId = $request->params[':id'];

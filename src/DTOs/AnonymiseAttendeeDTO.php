@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\DTOs;
 
 use Illuminate\Support\Carbon;
-use RequestItem;
+use Router\RequestItem;
 
 class AnonymiseAttendeeDTO
 {
@@ -20,7 +20,7 @@ class AnonymiseAttendeeDTO
         public readonly ?bool $isActive = false,
     ) {}
 
-    public static function create(RequestItem $request)
+    public static function create(RequestItem $request): self
     {
         $data = json_decode($request->body, true);
         return new self(
@@ -44,7 +44,7 @@ class AnonymiseAttendeeDTO
         );
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
