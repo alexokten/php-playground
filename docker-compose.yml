@@ -15,6 +15,7 @@ services:
       - .:/app:cached
       - caddy_data:/data
       - caddy_config:/config
+      - ./config/php.ini:/usr/local/etc/php/conf.d/99-custom.ini
     environment:
       - FRANKENPHP_CONFIG=worker ./public/index.php
     # extra_hosts:
