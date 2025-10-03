@@ -86,6 +86,7 @@ jobs:
           echo "DB_DATABASE_TEST=event_system_test" >> .env
           echo "DB_USERNAME_TEST=root" >> .env
           echo "DB_PASSWORD_TEST=root" >> .env
+          echo "DB_ROOT_PASSWORD_TEST=root" >> .env
 
       - name: Run migrations
         run: vendor/bin/phinx migrate -e testing
