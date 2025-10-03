@@ -47,7 +47,12 @@ jobs:
 
       - name: Set up database environment
         run: |
-          echo "DB_HOST_TEST=127.0.0.1" > .env
+          echo "DB_HOST=127.0.0.1" > .env
+          echo "DB_PORT=3306" >> .env
+          echo "DB_DATABASE=event_system_test" >> .env
+          echo "DB_USERNAME=root" >> .env
+          echo "DB_PASSWORD=root" >> .env
+          echo "DB_HOST_TEST=127.0.0.1" >> .env
           echo "DB_PORT_TEST=3306" >> .env
           echo "DB_DATABASE_TEST=event_system_test" >> .env
           echo "DB_USERNAME_TEST=root" >> .env
