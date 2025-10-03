@@ -16,8 +16,6 @@ class RouterUtils
         return Regex::match(self::PARAMETER_MATCH_PATTERN, $routeSegment)->hasMatch();
     }
 }
-
-// Test comment
 class RouteItem
 {
     public string $method;
