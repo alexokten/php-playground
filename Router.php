@@ -17,7 +17,6 @@ class RouterUtils
     }
 }
 
-// Test comment
 class RouteItem
 {
     public string $method;
