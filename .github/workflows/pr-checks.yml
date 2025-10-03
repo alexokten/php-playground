@@ -3,6 +3,9 @@ name: PR Checks
 on:
   pull_request:
     branches: [main]
+    types: [ready_for_review, reopened]
+  pull_request_review:
+    types: [submitted]
 
 jobs:
   static-analysis:
