@@ -76,11 +76,11 @@ jobs:
 
       - name: Set up test database environment
         run: |
-          echo "DB_HOST=127.0.0.1" > .env.local
-          echo "DB_PORT=3306" >> .env.local
-          echo "DB_DATABASE=event_system_test" >> .env.local
-          echo "DB_USERNAME=root" >> .env.local
-          echo "DB_PASSWORD=root" >> .env.local
+          echo "DB_HOST=127.0.0.1" > .env
+          echo "DB_PORT=3306" >> .env
+          echo "DB_DATABASE=event_system_test" >> .env
+          echo "DB_USERNAME=root" >> .env
+          echo "DB_PASSWORD=root" >> .env
 
       - name: Run migrations
         run: vendor/bin/phinx migrate -e testing
