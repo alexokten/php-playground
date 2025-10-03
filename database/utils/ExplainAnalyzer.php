@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-function parseExplainLine($line, $stepNumber)
+function parseExplainLine($line)
 {
     // Remove leading/trailing whitespace and arrows
     $line = trim($line, "-> \t\n\r\0\x0B");
@@ -98,14 +98,14 @@ function getOverallPerformanceFromExplain($parsedExplain)
     // For MySQL EXPLAIN ANALYZE, the root operation (usually first step) contains the total time
     // Look for the highest-level operation time as it represents the total query execution time
     $totalDuration = 0;
-    
-    foreach ($parsedExplain as $stepName => $step) {
+
+    foreach ($parsedExplain as $step) {
         if (isset($step['actual_time']['end'])) {
             // Use the 'end' time from the root operation as it represents total execution time
             $totalDuration = max($totalDuration, $step['actual_time']['end']);
         }
     }
-    
+
     // Convert from milliseconds to seconds if needed (MySQL EXPLAIN ANALYZE typically uses milliseconds)
     return $totalDuration / 1000;
 }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\DTOs;
 
 use Illuminate\Support\Carbon;
-use RequestItem;
+use Router\RequestItem;
 
 class RegisterForEventDTO
 {
@@ -16,7 +16,7 @@ class RegisterForEventDTO
         public readonly ?Carbon $unregisteredAt = null,
     ) {}
 
-    public static function create(RequestItem $request)
+    public static function create(RequestItem $request): self
     {
         $data = json_decode($request->body, true);
         return new self(
@@ -53,12 +53,12 @@ class RegisterForEventDTO
         );
     }
 
-    public function getAttendeeId()
+    public function getAttendeeId(): int
     {
         return $this->attendeeId;
     }
 
-    public function getEventId()
+    public function getEventId(): int
     {
         return $this->eventId;
     }

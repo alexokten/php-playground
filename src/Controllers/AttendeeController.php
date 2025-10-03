@@ -10,10 +10,10 @@ use App\DTOs\RegisterForEventDTO;
 use App\DTOs\UpdateAttendeeDTO;
 use App\Helpers\ExceptionHandler;
 use App\Helpers\Response;
-use App\Repositories\AttendeeRepository;
 use App\Services\AttendeeService;
 use Brick\JsonMapper\JsonMapper;
-use RequestItem;
+use Exception;
+use Router\RequestItem;
 use Throwable;
 
 header('Content-Type: application/json');
@@ -47,6 +47,11 @@ class AttendeeController
     {
         try {
             $dto = new GetAttendeeDTO((int)$request->params[':id']);
+
+            if ($dto->id === null) {
+                throw new Exception('ID does not exist');
+            }
+
             $attendee = $this->attendeeService->getAttendeeById($dto->id);
             Response::sendSuccess(
                 [$attendee->toArray()],

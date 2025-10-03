@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\DTOs;
 
-use RequestItem;
+use Router\RequestItem;
 
 class UpdateAttendeeDTO
 {
@@ -18,7 +18,7 @@ class UpdateAttendeeDTO
         public readonly ?bool $isActive = null
     ) {}
 
-    public static function create(RequestItem $request)
+    public static function create(RequestItem $request): self
     {
         $data = json_decode($request->body, true);
         return new self(
@@ -36,7 +36,7 @@ class UpdateAttendeeDTO
     public function toArray(): array
     {
         return array_filter([
-            'id' => (int)$this->id,
+            'id' => $this->id,
             'firstName' => $this->firstName,
             'lastName' => $this->lastName,
             'email' => $this->email,

@@ -11,7 +11,7 @@ use App\Jobs\SendEmailJob;
 use App\Repositories\QueueRepository;
 use App\Services\QueueService;
 use Brick\JsonMapper\JsonMapper;
-use RequestItem;
+use Router\RequestItem;
 use Throwable;
 
 class QueueController
@@ -24,12 +24,12 @@ class QueueController
         $this->queueService = new QueueService();
     }
 
-    public function sendTestEmail(RequestItem $request)
+    public function sendTestEmail(RequestItem $request): void
     {
         try {
             $delay = new GetEmailDelayQueueDTO((int)$request->params[':delay'])->getDelayInt();
             $job = new SendEmailJob('email@example.com', 'Subject', 'Hello!');
-            $this->queueService->addToQueue($job, 'email', $delay ?? 0);
+            $this->queueService->addToQueue($job, 'email', $delay);
             Response::sendSuccess(
                 ["details" => $job, 'seconds_delay' => $delay,]
             );

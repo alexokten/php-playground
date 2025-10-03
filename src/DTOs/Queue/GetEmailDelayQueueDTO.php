@@ -7,7 +7,7 @@ namespace App\DTOs\Queue;
 class GetEmailDelayQueueDTO
 {
     public function __construct(
-        public readonly ?int $delay,
+        public readonly int $delay,
     ) {}
 
     public function getDelayInt(): int
