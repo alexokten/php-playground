@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Attendee extends Model
 {
@@ -30,7 +31,7 @@ class Attendee extends Model
     }
 
 
-    public function events()
+    public function events(): BelongsToMany
     {
         return $this->belongsToMany(
             Event::class,
@@ -40,7 +41,7 @@ class Attendee extends Model
         )->withPivot(['registeredAt', 'unregisteredAt', 'attendedAt']);
     }
 
-    public function activeEvents()
+    public function activeEvents(): BelongsToMany
     {
         return $this->belongsToMany(
             Event::class,
@@ -51,7 +52,7 @@ class Attendee extends Model
             ->withPivot(['registeredAt', 'unregisteredAt', 'attendedAt']);
     }
 
-    public function allEventHistory()
+    public function allEventHistory(): BelongsToMany
     {
         return $this->belongsToMany(
             Event::class,
