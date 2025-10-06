@@ -67,7 +67,7 @@ function parseExplainLine($line)
 
     // Calculate efficiency metrics
     if ($parsed['estimated_rows'] && $parsed['actual_rows']) {
-        $parsed['row_estimate_accuracy'] = round(($parsed['actual_rows'] / $parsed['estimated_rows']) * 100, 1) . '%';
+        $parsed['row_estimate_accuracy'] = (string) round(((float) $parsed['actual_rows'] / (float) $parsed['estimated_rows']) * 100.0, 1) . '%';
     }
 
     if (isset($parsed['actual_time']['duration'])) {

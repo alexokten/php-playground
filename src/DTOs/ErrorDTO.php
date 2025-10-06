@@ -22,7 +22,7 @@ class ErrorDTO
             success: false,
             message: $message,
             data: $data,
-            statusCode: $statusCode ?? 500,
+            statusCode: $statusCode,
             timestamp: Carbon::now()->toISOString(),
         );
     }

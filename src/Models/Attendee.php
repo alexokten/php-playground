@@ -31,6 +31,7 @@ class Attendee extends Model
         ];
     }
 
+    public function deadFunction(): void {}
 
     public function events(): BelongsToMany
     {

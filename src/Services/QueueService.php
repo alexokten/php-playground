@@ -63,7 +63,7 @@ class QueueService
             return true;
         } catch (Throwable $e) {
             if ($job->attempts < 3) {
-                $delay = pow(2, $job->attempts) * 60; // <- pow === power, each retry waits twice as long as the prev one
+                $delay = (int) (pow((float)2, (float)$job->attempts) * 60.0); // <- pow === power, each retry waits twice as long as the prev one
                 $this->queueRepository->release($job, delay: $delay);
                 ray("Job {$job->id} will retry in {$delay}s")->yellow();
                 return false;
@@ -100,7 +100,7 @@ class QueueService
                 $processedCount++;
             } catch (Throwable $e) {
                 if ($job->attempts < 3) {
-                    $delay = pow(2, $job->attempts) * 60;
+                    $delay = (int) (pow((float)2, (float)$job->attempts) * 60.0);
                     $this->queueRepository->release($job, delay: $delay);
                     ray("Job {$job->id} will retry in {$delay}s")->yellow();
                 } else {

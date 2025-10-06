@@ -61,7 +61,7 @@ class Event extends Model
     public function scopeWhereIsSoldOut(Builder $query): Builder
     {
         return $query->withCount(
-            ['attendees' => function ($q) {
+            ['attendees' => function ($q): void {
                 $q->whereNull('unregisteredAt');
             }]
         )->havingRaw('attendees_count >= maxTickets');

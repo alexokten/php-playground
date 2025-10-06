@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Controllers\AttendeeController;
 use App\Controllers\EventController;
 use App\Controllers\QueueController;
+use Router\Router;
 
 try {
     require_once __DIR__ . '/../vendor/autoload.php';
