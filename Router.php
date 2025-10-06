@@ -226,9 +226,14 @@ class RequestFactory
     public static function createFromGlobals(): RequestItem
     {
         $body = file_get_contents('php://input');
+        $uri = $_SERVER['REQUEST_URI'] ?? '/';
+
+        // Strip query string from URL for routing
+        $url = parse_url($uri, PHP_URL_PATH) ?: $uri;
+
         return new RequestItem(
             method: $_SERVER['REQUEST_METHOD'] ?? 'GET',
-            url: $_SERVER['REQUEST_URI'] ?? '/',
+            url: $url,
             headers: getallheaders() ?: [],
             body: $body !== false ? $body : '',
         );
