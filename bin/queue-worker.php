@@ -8,7 +8,6 @@ require_once __DIR__ . '/../database/connection.php';
 
 use App\Services\QueueService;
 
-// Configuration
 $queueName = 'email';  // Allow queue name as argument
 $sleepDuration = 2;
 
