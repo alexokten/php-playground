@@ -30,6 +30,10 @@
 	"config": {
 		"optimize-autoloader": true,
 		"preferred-install": "dist",
-		"sort-packages": true
+		"sort-packages": true,
+		"platform": {
+			"ext-vips": "1.0.13",
+			"ext-imagick": "3.7.0"
+		}
 	}
 }
