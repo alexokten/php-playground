@@ -9,7 +9,6 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
-    // Use an array so the reference is shared across all child classes
     private static array $state = ['migrationsRun' => false];
 
     public static function setUpBeforeClass(): void
