@@ -9,7 +9,7 @@ on:
 
 jobs:
   gitleaks:
-    name: Gitleaks Secret Scan
+    name: Gitleaks (secret scan)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
