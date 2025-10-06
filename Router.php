@@ -20,7 +20,7 @@ class RouteItem
 {
     public string $method;
     public string $slug;
-    public array | callable $callback;
+    public array $callback;
     public ?string $controllerClass = null;
     public ?string $controllerMethod = null;
 

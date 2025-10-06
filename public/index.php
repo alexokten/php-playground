@@ -3,8 +3,10 @@
 declare(strict_types=1);
 
 use App\Controllers\AttendeeController;
+use App\Controllers\ConfigController;
 use App\Controllers\EventController;
 use App\Controllers\QueueController;
+use Router\Router;
 
 try {
     require_once __DIR__ . '/../vendor/autoload.php';
@@ -16,6 +18,7 @@ try {
 
     $router = new Router();
     $router
+        ->get('/config', [ConfigController::class, 'getConfig'])
         ->get('/api/attendee/all', [AttendeeController::class, 'getAllAttendees'])
         ->get('/api/attendee/get/:id', [AttendeeController::class, 'getAttendeeById'])
         ->get('/api/attendee/events/:id', [AttendeeController::class, 'getAttendeeEvents'])
