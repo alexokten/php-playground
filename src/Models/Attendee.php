@@ -7,12 +7,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+//comment delete
 class Attendee extends Model
 {
     protected $table = 'attendees';
 
-    const CREATED_AT = 'createdAt';
-    const UPDATED_AT = 'updatedAt';
+    const string CREATED_AT = 'createdAt';
+    const string UPDATED_AT = 'updatedAt';
 
     protected $guarded = ['id', 'createdAt', 'updatedAt'];
 
