@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\ImageProcessing;
 
 use Exception;
+use Imagick;
 
 class ImageBenchmark
 {
@@ -79,8 +80,8 @@ class ImageBenchmark
 
             return [
                 'success' => true,
-                'execution_time_ms' => round(($endTime - $startTime) * 1000, 2),
-                'memory_used_mb' => round(($endMemory - $startMemory) / 1024 / 1024, 2),
+                'execution_time_ms' => round(($endTime - $startTime) * 1000.0, 2),
+                'memory_used_mb' => round((float) ($endMemory - $startMemory) / 1024.0 / 1024.0, 2),
                 'output_size' => filesize($outputPath),
                 'output_path' => basename($outputPath),
             ];
@@ -154,8 +155,8 @@ class ImageBenchmark
 
             return [
                 'success' => true,
-                'execution_time_ms' => round(($endTime - $startTime) * 1000, 2),
-                'memory_used_mb' => round(($endMemory - $startMemory) / 1024 / 1024, 2),
+                'execution_time_ms' => round(($endTime - $startTime) * 1000.0, 2),
+                'memory_used_mb' => round((float) ($endMemory - $startMemory) / 1024.0 / 1024.0, 2),
                 'output_size' => file_exists($outputPath) ? filesize($outputPath) : 0,
                 'output_path' => basename($outputPath),
             ];
@@ -221,10 +222,10 @@ class ImageBenchmark
             }
         }
 
-        $summary['imagick_avg_time'] = !empty($imagickTimes) ? round(array_sum($imagickTimes) / count($imagickTimes), 2) : 0;
-        $summary['vips_avg_time'] = !empty($vipsTimes) ? round(array_sum($vipsTimes) / count($vipsTimes), 2) : 0;
-        $summary['imagick_avg_memory'] = !empty($imagickMemory) ? round(array_sum($imagickMemory) / count($imagickMemory), 2) : 0;
-        $summary['vips_avg_memory'] = !empty($vipsMemory) ? round(array_sum($vipsMemory) / count($vipsMemory), 2) : 0;
+        $summary['imagick_avg_time'] = !empty($imagickTimes) ? round((float) array_sum($imagickTimes) / (float) count($imagickTimes), 2) : 0;
+        $summary['vips_avg_time'] = !empty($vipsTimes) ? round((float) array_sum($vipsTimes) / (float) count($vipsTimes), 2) : 0;
+        $summary['imagick_avg_memory'] = !empty($imagickMemory) ? round((float) array_sum($imagickMemory) / (float) count($imagickMemory), 2) : 0;
+        $summary['vips_avg_memory'] = !empty($vipsMemory) ? round((float) array_sum($vipsMemory) / (float) count($vipsMemory), 2) : 0;
 
         return $summary;
     }
