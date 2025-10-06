@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Controllers\AttendeeController;
 use App\Controllers\EventController;
+use App\Controllers\ImageBenchmarkController;
 use App\Controllers\QueueController;
 use Router\Router;
 
@@ -29,7 +30,10 @@ try {
         ->get('/api/event/all', [EventController::class, 'getAllEvents'])
         ->get('/api/event/sales/percentage/:id', [EventController::class, 'getEventTicketSalesAsPercentage'])
 
-        ->post('/api/queue/test-email/:delay', [QueueController::class, 'sendTestEmail']);
+        ->post('/api/queue/test-email/:delay', [QueueController::class, 'sendTestEmail'])
+
+        ->get('/api/image-benchmark', [ImageBenchmarkController::class, 'runBenchmark'])
+        ->get('/api/images/list', [ImageBenchmarkController::class, 'listAvailableImages']);
 
 
     $router->dispatch();

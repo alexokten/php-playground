@@ -1,0 +1,19 @@
+meta {
+  name: ImageBenchmark
+  type: http
+  seq: 11
+}
+
+get {
+  url: http://localhost:8080/api/image-benchmark?image=test_large.jpg
+  body: none
+  auth: inherit
+}
+
+params:query {
+  image: test_large.jpg
+}
+
+settings {
+  encodeUrl: true
+}

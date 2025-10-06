@@ -4,8 +4,14 @@ FROM dunglas/frankenphp
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
+    imagemagick \
+    libmagickwand-dev \
+    libvips-dev \
+    libvips-tools \
     && rm -rf /var/lib/apt/lists/* \
-    && docker-php-ext-install pdo pdo_mysql
+    && docker-php-ext-install pdo pdo_mysql \
+    && pecl install imagick vips \
+    && docker-php-ext-enable imagick vips
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
