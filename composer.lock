@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "185059e7f5db1c8aea238d3e5f7608a3",
+    "content-hash": "76f89c1c417a9e7dea6788ffefd6bca2",
     "packages": [
         {
             "name": "brick/json-mapper",
