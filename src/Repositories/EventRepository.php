@@ -31,7 +31,7 @@ class EventRepository
         return $event->update($data);
     }
 
-    public function delete(Event $event): bool
+    public function delete(Event $event): ?bool
     {
         return $event->delete();
     }
@@ -46,13 +46,13 @@ class EventRepository
         return $event->attendees()->get();
     }
 
-    public function findAllFutureEvents()
+    public function findAllFutureEvents(): Event
     {
         return Event::where('eventDate', ">", Carbon::now())
             ->get();
     }
 
-    public function findAllPastEvents()
+    public function findAllPastEvents(): Event
     {
         return Event::where('eventDate', "<", Carbon::now())
             ->get();
@@ -61,7 +61,7 @@ class EventRepository
     public function findAllFutureEventsWithTickets(): Collection
     {
         return Event::whereIsInFuture()
-            ->withCount(['attendees' => function ($query) {
+            ->withCount(['attendees' => function (object $query): void {
                 $query->wherePivotNull('unregisteredAt');
             }])
             ->having('attendees_count', '<', DB::raw('maxTickets'))
@@ -71,7 +71,7 @@ class EventRepository
     public function findAllFutureEventsThatAreSoldOut(): Collection
     {
         return new Event()->whereIsInFuture()
-            ->withCount(['attendees' => function ($query) {
+            ->withCount(['attendees' => function (object $query): void {
                 $query->wherePivotNull('unregisteredAt');
             }])
             ->having('attendees_count', '===', DB::raw('maxTickets'))

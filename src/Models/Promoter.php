@@ -29,11 +29,6 @@ class Promoter extends Model
 
     public function events()
     {
-        return $this->hasMany(
-            Event::class,
-            'event_promoters',
-            'userId',
-            'eventId'
-        );
+        return $this->hasMany(Event::class);
     }
 }

@@ -14,7 +14,7 @@ use Dotenv\Dotenv;
 /** 1 - Load environment variables (prefer local if exists, skip in CI) */
 if (file_exists(__DIR__ . '/../.env.local')) {
     $dotenv = Dotenv::createImmutable(__DIR__ . '/..');
-    $dotenv->load('.env.local');
+    $dotenv->load();
 } elseif (file_exists(__DIR__ . '/../.env')) {
     $dotenv = Dotenv::createImmutable(__DIR__ . '/..');
     $dotenv->load();
@@ -106,7 +106,7 @@ if (class_exists('Spatie\Ray\Ray')) {
                 foreach ($explainResults as $row) {
                     $explainColumn = $row->EXPLAIN ?? $row->{'QUERY PLAN'} ?? $row->explain ?? null;
                     if ($explainColumn) {
-                        $parsed = parseExplainLine($explainColumn, $stepNumber);
+                        $parsed = parseExplainLine($explainColumn);
                         if ($parsed) {
                             $parsedExplain["Step {$stepNumber}"] = $parsed;
                             $stepNumber++;
@@ -122,7 +122,7 @@ if (class_exists('Spatie\Ray\Ray')) {
                     // Display SQL query with EXPLAIN ANALYZE-based performance color
                     ray()
                         ->html($highlightedQuery)
-                        ->label('SQL Query (' . round($explainDuration * 1000, 2) . 'ms from EXPLAIN)')
+                        ->label('SQL Query (' . (string) round($explainDuration * 1000, 2) . 'ms from EXPLAIN)')
                         ->{$performanceColor}();
 
                     ray($parsedExplain)
@@ -133,7 +133,7 @@ if (class_exists('Spatie\Ray\Ray')) {
                     // Fallback to Laravel query time if no EXPLAIN data
                     $queryDuration = $query->time / 1000;
                     $performanceColor = getPerformanceColor($queryDuration);
-                    
+
                     ray()
                         ->html($highlightedQuery)
                         ->label('SQL Query (' . $query->time . 'ms)')
@@ -143,11 +143,11 @@ if (class_exists('Spatie\Ray\Ray')) {
                 $isExplainQuery = false;
             } catch (\Exception $e) {
                 $isExplainQuery = false;
-                
+
                 // Fallback to Laravel query time if EXPLAIN ANALYZE fails
                 $queryDuration = $query->time / 1000;
                 $performanceColor = getPerformanceColor($queryDuration);
-                
+
                 ray()
                     ->html($highlightedQuery)
                     ->label('SQL Query (' . $query->time . 'ms)')
@@ -162,7 +162,7 @@ if (class_exists('Spatie\Ray\Ray')) {
             // For non-SELECT queries, use Laravel query time
             $queryDuration = $query->time / 1000;
             $performanceColor = getPerformanceColor($queryDuration);
-            
+
             ray()
                 ->html($highlightedQuery)
                 ->label('SQL Query (' . $query->time . 'ms)')

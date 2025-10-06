@@ -39,7 +39,7 @@ class AttendeeRepository
         return $attendee->update($data);
     }
 
-    public function delete(Attendee $attendee): bool
+    public function delete(Attendee $attendee): ?bool
     {
         return $attendee->delete();
     }

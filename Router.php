@@ -20,22 +20,24 @@ class RouteItem
 {
     public string $method;
     public string $slug;
-    public array | callable $callback;
+    public array $callback;
     public ?string $controllerClass = null;
     public ?string $controllerMethod = null;
 
     public function __construct(
         string $method,
         string $slug,
-        callable | array $callback
+        array | callable $callback
     ) {
         $this->method = $method;
         $this->slug = $slug;
-        $this->callback = $callback;
 
         if (is_array($callback)) {
+            $this->callback = $callback;
             $this->controllerClass = $callback[0];
             $this->controllerMethod = $callback[1];
+        } else {
+            $this->callback = [$callback];
         }
     }
 
